@@ -4,16 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <title>base</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/../../static/budget/base_styles.css' %}" type="text/css">
 </head>
 <body>
 
 <div id="container">
     <div id="upper">
-        <h1>Upper cos tam</h1>
+        <h1>Witaj ktoś</h1>
     </div>
     <div id="content">
-        Content
+    <label>Browse: </label>
+    <select name="dropdown1">
+        <option value="income">Income</option>
+        <option value="Expense">Expense</option>
+    </select>
+        {% if income_list %}
+            <ul>
+                {% for income in income_list %}
+                    <li>Income: {{ income.income_name }}</li>
+                    Desc: {{ income.income_desc }}
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No income are available.</p>
+        {% endif %}
     </div>
     <div id="short_details">
         Jakieś tam detale
