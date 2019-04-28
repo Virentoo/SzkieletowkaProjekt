@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>base</title>
-    <link rel="stylesheet" href="{% static 'css/../../static/budget/base_styles.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static '/budget/base_styles.css' %}" type="text/css">
 </head>
 <body>
 
@@ -13,21 +13,18 @@
         <h1>Witaj ktoś</h1>
     </div>
     <div id="content">
-    <label>Browse: </label>
-    <select name="dropdown1">
-        <option value="income">Income</option>
-        <option value="Expense">Expense</option>
-    </select>
-        {% if income_list %}
-            <ul>
-                {% for income in income_list %}
-                    <li>Income: {{ income.income_name }}</li>
-                    Desc: {{ income.income_desc }}
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No income are available.</p>
-        {% endif %}
+        <form action="{% url 'base' %}" method="post">
+            {% csrf_token %}
+            <label > Browse:
+                <select  name="dropdown_panel" onchange="this.form.submit()">
+                    <option selected disabled hidden>{{ selected_panel }}</option>
+                    <option name="choice" value=1>Income</option>
+                    <option name="choice" value=2>Expense</option>
+                </select>
+            </label>
+        </form>
+        {% block content %} {% endblock content %}
+
     </div>
     <div id="short_details">
         Jakieś tam detale

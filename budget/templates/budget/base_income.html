@@ -1,0 +1,15 @@
+{% extends "budget/base.html" %}
+{% block content %}
+    {% if income_list %}
+        <ul>
+            {% for income in income_list %}
+                <li>Income: {{ income.income_name }} </li>
+                Desc: {{ income.income_desc }} <br>
+                Amount: {{ income.amount }} <br>
+                <br>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No income are available.</p>
+    {% endif %}
+{% endblock content %}

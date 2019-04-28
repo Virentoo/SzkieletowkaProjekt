@@ -1,0 +1,15 @@
+{% extends "budget/base.html" %}
+{% block content %}
+    {% if expense_list %}
+        <ul>
+            {% for expense in expense_list %}
+                <li>Expense: {{ expense.expense_name }} </li>
+                Desc: {{ expense.expense_desc }} <br>
+                Price: {{ expense.amount }} <br>
+                <br>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No expense are available.</p>
+    {% endif %}
+{% endblock content %}
