@@ -9,8 +9,8 @@ class User(models.Model):
 
 class Category(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField
-    monthly = models.BooleanField(default = False)
+    name = models.CharField(max_length=50, default="")
+    monthly = models.BooleanField(default=False)
 
 
 class Income(models.Model):
@@ -27,4 +27,3 @@ class Expense(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     expense_date = models.DateTimeField('Expense added')
     amount = models.FloatField(default=0)
-
