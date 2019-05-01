@@ -1,50 +1,52 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>base</title>
-    <link rel="stylesheet" href="{% static '/budget/base_styles.css' %}" type="text/css">
-</head>
-<body>
+{% extends "budget/base_recent.html" %}
 
-<div id="container">
-    <div id="upper">
-        <table style="width: 100%">
-            <tr>
-                <th><h1 style="text-align: left">Witaj ktoś</h1></th>
-                <th><p style="text-align: right">{{ date }}</p></th>
-            </tr>
-        </table>
-    </div>
-    <div id="content">
-        <form action="{% url 'base' %}" method="post">
-            {% csrf_token %}
-            <label> Browse:
-                <select name="dropdown_panel" onchange="this.form.submit()">
-                    <option selected disabled hidden>{{ selected_panel }}</option>
-                    <option name="choice" value=1>Income</option>
-                    <option name="choice" value=2>Expense</option>
-                </select>
-            </label>
-        </form>
-        <hr>
-        {% block content %} {% endblock content %}
+{% block head %}
 
-    </div>
-    <div id="short_details">
-        <form action="{% url 'base/newincome' %}" method="post">
-            {% csrf_token %}
-            <button name="income_button" id="income_button" type="submit">Dodaj nowy Income</button>
-        </form>
-        <form action="{% url 'base/newexpense' %}" method="post">
-            {% csrf_token %}
-            <button name="expense_button" id="expense_button" type="submit">Dodaj nowy Expense</button>
-        </form>
-    </div>
-    <div id="footer">
-        <h1>Footer!!!</h1>
-    </div>
-</div>
-</body>
-</html>
+{% endblock head %}
+
+{% block upper %}
+
+{% endblock %}
+
+{% block content %}
+    {% if category_list %}
+        <ul>
+            {% for category in category_list %}
+                <div class="card">
+                    <div class="card-header">
+                        <a class="card-link" data-toggle="collapse"
+                           href="#collapse{{ forloop.counter }}">{{ category.name }}
+                            ({{ category.user.login }})
+                            {% if category.monthly %} | Monthly {% endif %}</a>
+                        <div id="collapse{{ forloop.counter }}" class="panel-collapse collapse show">
+                            {% load base_extra %}
+                            {% with item_list|get:category as cat_items %}
+                                <div class="panel-body">
+                                    {% for item in cat_items %}
+                                        {% if item.type == "expense" %}
+                                            - Wydatek: {{ item.name }}, Koszt: {{ item.amount }} <br>
+                                        {% elif item.type == "income" %}
+                                            - Wpływ: {{ item.name }}, Kwota: {{ item.amount }} <br>
+                                        {% endif %}
+                                        </div>
+                                    {% endfor %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+                <br>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No categories are available.</p>
+    {% endif %}
+{% endblock content %}
+
+{% block short_details %}
+    <form action="{% url 'base/recent' %}" method="post">
+        {% csrf_token %}
+        <button class="btn btn-info" name="expense_button" id="expense_button" value="expense" type="submit">
+            Show recent
+        </button>
+    </form>
+{% endblock %}

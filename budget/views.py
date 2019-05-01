@@ -1,28 +1,34 @@
 import datetime
 
 from django.shortcuts import render
-from budget.models import Income, Expense
+from budget.models import Transaction, Category
 
 
-def base(request):
+def base_recent(request):
     date = datetime.datetime.now()
-    if request.method == "POST":
-        selected_id = request.POST['dropdown_panel']
-    else:
-        selected_id = 1
-
+    selected_id = request.POST.get('dropdown_panel', 1)
     context = {'date': date}
+
     if selected_id == "2":
-        expense_list = Expense.objects.order_by('-expense_date')
-        context['expense_list'] = expense_list
+        expense_list = Transaction.objects.filter(type="expense").order_by('-date')
+        context['transaction_list'] = expense_list
         context['selected_panel'] = 'Expense'
-        return render(request, 'budget/base_expense.html', context)
     else:
-        income_list = Income.objects.order_by('-income_date')
-        context['income_list'] = income_list
+        income_list = Transaction.objects.filter(type="income").order_by('-date')
+        context['transaction_list'] = income_list
         context['selected_panel'] = 'Income'
-        return render(request, 'budget/base_income.html', context)
+    return render(request, 'budget/base_recent.html', context)
 
 
 def home(request):
     return render(request, 'budget/home.html')
+
+
+def base(request):
+    category_list = Category.objects.order_by('-name')
+    context = {'category_list': category_list}
+    item_list = {}
+    for item in category_list:
+        item_list[item] = (Transaction.objects.filter(category=item))
+    context['item_list'] = item_list
+    return render(request, 'budget/base.html', context)

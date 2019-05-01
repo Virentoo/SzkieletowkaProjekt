@@ -19,23 +19,13 @@ class Category(models.Model):
         return "%s - %s" % (self.user, self.name)
 
 
-class Income(models.Model):
-    income_name = models.CharField(max_length=100)
-    income_desc = models.CharField(max_length=300)
+class Transaction(models.Model):
+    name = models.CharField(max_length=100)
+    desc = models.CharField(max_length=300)
+    type = models.CharField(max_length=50, choices=(("income", "Income"), ("expense", "Expense")))
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    income_date = models.DateTimeField('Income added')
+    date = models.DateTimeField('Added')
     amount = models.FloatField(default=0)
 
     def __str__(self):
-        return self.income_name
-
-
-class Expense(models.Model):
-    expense_name = models.CharField(max_length=100)
-    expense_desc = models.CharField(max_length=300)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    expense_date = models.DateTimeField('Expense added')
-    amount = models.FloatField(default=0)
-
-    def __str__(self):
-        return self.expense_name
+        return self.name
