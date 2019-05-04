@@ -2,8 +2,10 @@ import datetime
 
 from django.shortcuts import render
 from budget.models import Transaction, Category
+from django.contrib.auth.decorators import login_required
 
 
+@login_required()
 def base_recent(request):
     date = datetime.datetime.now()
     selected_id = request.POST.get('dropdown_panel', 1)
@@ -24,6 +26,7 @@ def home(request):
     return render(request, 'budget/home.html')
 
 
+@login_required()
 def base(request):
     category_list = Category.objects.order_by('-name')
     context = {'category_list': category_list}
