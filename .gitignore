@@ -2,6 +2,8 @@
 # Created by https://www.gitignore.io/api/osx,linux,django,python,windows
 # Edit at https://www.gitignore.io/?templates=osx,linux,django,python,windows
 
+/.idea
+workspace.xml
 ### Django ###
 *.log
 *.pot
@@ -258,3 +260,15 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/osx,linux,django,python,windows
+accounts/__init__.py
+accounts/admin.py
+accounts/apps.py
+accounts/forms.py
+accounts/migrations/__init__.py
+accounts/models.py
+accounts/templates/
+accounts/tests.py
+accounts/views.py
+budget/migrations/0003_auto_20190503_1832.py
+budget/migrations/0003_category_name.py
+budget/migrations/0004_auto_20190429_2337.py
