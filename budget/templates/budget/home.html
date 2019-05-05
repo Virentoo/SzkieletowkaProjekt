@@ -24,19 +24,19 @@
 
         <div id="menu">
 
-            <ul>
+            <ul style="background-color: #333">
 
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'profile' %}">Profile</a></li>
-                    <li><a href="{% url 'logout' %}">Log Out</a></li>
+                    <li><a style="float: right; :hover=#111" href="{% url 'profile' %}">Profile</a></li>
+                    <li><a style="float: right; :hover=#111" href="{% url 'logout' %}">Log Out</a></li>
                 {% else %}
-                    <li><a class="active" href="{% url 'login' %}">Login</a></li>
-                    <li><a href="{% url 'register' %}">Sign Up</a></li>
+                    <li><a style="float: right; :hover=#111" class="active" href="{% url 'login' %}">Login</a></li>
+                    <li><a style="float: right; :hover=#111" href="{% url 'register' %}">Sign Up</a></li>
 
                 {% endif %}
 
-  		        <li><a href="#contact">Contact</a></li>
-  		        <li><a href="#about">About</a></li>
+  		        <li><a style="float: right; :hover=#111" href="#contact">Contact</a></li>
+  		        <li><a style="float: right; :hover=#111" href="#about">About</a></li>
 
             </ul>
 
