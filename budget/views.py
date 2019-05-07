@@ -20,7 +20,7 @@ def base_recent(request):
         income_list = Transaction.objects.filter(category__user=user, type="income").order_by('-date')
         context['transaction_list'] = income_list
         context['selected_panel'] = 'Income'
-    return render(request, 'budget/base_recent.html', context)
+    return render(request, 'budget/base.html', context)
 
 
 def home(request):
@@ -37,4 +37,4 @@ def base(request):
         item_list[item] = (
             Transaction.objects.filter(category=item))
     context['item_list'] = item_list
-    return render(request, 'budget/base.html', context)
+    return render(request, 'budget/base_recent.html', context)
