@@ -82,22 +82,22 @@
             {% endif %}
         {% endblock content %}
     </div>
-    <div id="short_details">
-        {% block right %}
-        <form action="{% url 'base/new' %}" method="post">
-            {% csrf_token %}
-            <button class="btn btn-info" id="income_button" value="income" type="submit">Dodaj nowy
-                Income
-            </button>
-            <button class="btn btn-info" id="expense_button" value="expense" type="submit">Dodaj
-                nowy Expense
-            </button>
-        </form>
-        <hr>
-        {% endblock right%}
-        {% block short_details %}
-        {% endblock %}
-    </div>
+    {% block right %}
+        <div id="short_details">
+            <form action="{% url 'base/new' %}" method="post">
+                {% csrf_token %}
+                <button class="btn btn-info" id="income_button" value="income" type="submit">Dodaj nowy
+                    Income
+                </button>
+                <button class="btn btn-info" id="expense_button" value="expense" type="submit">Dodaj
+                    nowy Expense
+                </button>
+            </form>
+            <hr>
+            {% block short_details %}
+            {% endblock %}
+        </div>
+    {% endblock right %}
     <div id="footer">
         <h1>Footer!!!</h1>
     </div>
