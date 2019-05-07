@@ -83,6 +83,7 @@
         {% endblock content %}
     </div>
     <div id="short_details">
+        {% block right %}
         <form action="{% url 'base/new' %}" method="post">
             {% csrf_token %}
             <button class="btn btn-info" id="income_button" value="income" type="submit">Dodaj nowy
@@ -93,6 +94,7 @@
             </button>
         </form>
         <hr>
+        {% endblock right%}
         {% block short_details %}
         {% endblock %}
     </div>
