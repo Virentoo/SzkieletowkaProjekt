@@ -1,6 +1,60 @@
-{% extends "budget/base.html" %}
-{% block content %}
-<h1>
-THIS IS  THE HOME PAGE
-</h1>
-{% endblock content %}
+<!DOCTYPE HTML>
+{% load static %}
+<html>
+
+
+<head>
+    <meta charset="utf-8"/>
+    <title> Budget </title>
+    <meta name="description" content="Budget"/>
+    <meta name="keywords" content="money, save, budget, home budget"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1/">
+    <link rel="stylesheet" href="{% static '/budget/base_styles.css' %}">
+
+
+
+</head>
+
+<body>
+    <div id="container">
+
+        <div id="logo">
+            <h1> Home budget </h1>
+        </div>
+
+        <div id="menu">
+
+            <ul style="background-color: #333">
+
+                {% if user.is_authenticated %}
+                    <li><a style="float: right; :hover=#111" href="{% url 'profile' %}">Profile</a></li>
+                    <li><a style="float: right; :hover=#111" href="{% url 'logout' %}">Log Out</a></li>
+                {% else %}
+                    <li><a style="float: right; :hover=#111" class="active" href="{% url 'login' %}">Login</a></li>
+                    <li><a style="float: right; :hover=#111" href="{% url 'register' %}">Sign Up</a></li>
+
+                {% endif %}
+
+  		        <li><a style="float: right; :hover=#111" href="#contact">Contact</a></li>
+  		        <li><a style="float: right; :hover=#111" href="#about">About</a></li>
+
+            </ul>
+
+
+        </div>
+
+
+
+        <div id="content">
+            Nasze pokolenie aezakmi
+        </div>
+
+        <div id="footer">
+            <h4> All rights reserved </h4>
+        </div>
+
+
+    </div>
+</body>
+
+</html>
