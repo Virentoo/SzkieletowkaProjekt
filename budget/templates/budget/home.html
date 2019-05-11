@@ -29,6 +29,7 @@
                 {% if user.is_authenticated %}
                     <li><a style="float: right; :hover=#111" href="{% url 'profile' %}">Profile</a></li>
                     <li><a style="float: right; :hover=#111" href="{% url 'logout' %}">Log Out</a></li>
+                    <li><a style="float: right; :hover=#111" href="{% url 'budget' %}">Budget</a></li>
                 {% else %}
                     <li><a style="float: right; :hover=#111" class="active" href="{% url 'login' %}">Login</a></li>
                     <li><a style="float: right; :hover=#111" href="{% url 'register' %}">Sign Up</a></li>

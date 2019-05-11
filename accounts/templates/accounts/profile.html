@@ -1,17 +1,22 @@
 {% extends "budget/base.html" %}
 {% load crispy_forms_tags %}
+{% load static %}
 
-{% block head %}
-
-{% endblock head %}
-
-{% block upper %}
-
+{% block upper_icon %}
+    <th style="width: 50px">
+        <form action="{% url 'home' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-default">
+                <img src="{% static '/budget/back-icon.png' %}" alt="" style="width: 40px"/>
+            </button>
+        </form>
+    </th>
 {% endblock %}
 
 {% block content %}
-
-    <h2>Halko</h2>
+    <div id="content" style="width: 100%">
+        <h2>Halko</h2>
+    </div>
 
 {% endblock content %}
 

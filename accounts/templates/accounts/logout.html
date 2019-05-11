@@ -1,23 +1,13 @@
 {% extends "budget/base.html" %}
 {% load crispy_forms_tags %}
-
-{% block head %}
-
-{% endblock head %}
-
-{% block upper %}
-
-{% endblock %}
-
 {% block content %}
-    <h2>Correctly logged out</h2>
+    <div id="content"
+    style="width: 100%">
+        <h2>Correctly logged out</h2>
         <div class="border-top pt-3">
             <small class="text-muted">
                 <a class="ml-2" href="{% url 'login' %}">Log In Again</a>
             </small>
         </div>
-
+    </div>
 {% endblock content %}
-
-{% block short_details %}
-{% endblock %}

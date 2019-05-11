@@ -1,16 +1,9 @@
 {% extends "budget/base.html" %}
 {% load crispy_forms_tags %}
 
-{% block head %}
-
-{% endblock head %}
-
-{% block upper %}
-
-{% endblock %}
-
 {% block content %}
-    <div class="content-section">
+    <div id="content" class="content-section"
+    style="padding: 20px; width: 100%">
         <form method="POST">
             {% csrf_token %}
             <fieldset class="form-group">
@@ -27,7 +20,4 @@
             </small>
         </div>
     </div>
-{% endblock content %}
-
-{% block right %}
 {% endblock %}

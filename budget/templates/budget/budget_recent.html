@@ -1,0 +1,68 @@
+{% extends "budget/base.html" %}
+{% load static %}
+<body>
+{% block upper_icon %}
+    <th style="width: 50px">
+        <form action="{% url 'budget' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-default">
+                <img src="{% static '/budget/back-icon.png' %}" alt="" style="width: 40px"/>
+            </button>
+        </form>
+    </th>
+{% endblock %}
+
+{% block content_middle %}
+    <form action="{% url 'budget/recent' %}" method="post">
+        {% csrf_token %}
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Show recent
+                <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+                <li>
+                    <button {% if selected_panel == 'Income' %} disabled {% endif %} class="dropdown-item"
+                                                                name="dropdown_panel" value=1 type="submit">
+                        Income
+                    </button>
+                </li>
+                <li>
+                    <button {% if selected_panel == 'Expense' %} disabled {% endif %} class="dropdown-item"
+                                                                 name="dropdown_panel" value=2 type="submit">
+                        Expense
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </form>
+    <br>
+    {% if transaction_list %}
+        <ul>
+            {% for transaction in transaction_list %}
+                <li>Expense: {{ transaction.name }} </li>
+                Desc: {{ transaction.desc }} <br>
+                Price: {{ transaction.amount }} <br>
+                Date: {{ transaction.date }} <br>
+                <br>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No transactions are available.</p>
+    {% endif %}
+{% endblock %}
+
+{% block right %}
+    <div id="short_details">
+        <form action="{% url 'budget/new' %}" method="post">
+            {% csrf_token %}
+            <button class="btn btn-info" id="income_button" value="income" type="submit">Dodaj nowy
+                Income
+            </button>
+            <button class="btn btn-info" id="expense_button" value="expense" type="submit">Dodaj
+                nowy Expense
+            </button>
+        </form>
+        <hr>
+        {% block short_details %}
+        {% endblock %}
+    </div>
+{% endblock %}

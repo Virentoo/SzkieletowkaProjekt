@@ -10,7 +10,9 @@
 {% endblock %}
 
 {% block content %}
-    <div class="content-section">
+    <div class="content-section"
+    id="content"
+    style="width: 100%; padding: 20px">
         <form method="POST">
             {% csrf_token %}
             <fieldset class="form-group">
