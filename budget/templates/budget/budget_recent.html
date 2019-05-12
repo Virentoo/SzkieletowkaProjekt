@@ -1,5 +1,9 @@
 {% extends "budget/base.html" %}
 {% load static %}
+
+{% block head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{% endblock %}
 <body>
 {% block upper_icon %}
     <th style="width: 50px">
@@ -63,6 +67,87 @@
         </form>
         <hr>
         {% block short_details %}
+            <form action="{% url 'budget/recent' %}" method="post">
+                {% csrf_token %}
+                <div id="filer-form-price" class="form-inline">
+                    <label for="priceInFrom" class="mr-sm-2">Price:</label>
+                    <input name="priceFrom" type="number" class="col-0 form-control form-control-sm" id="priceInFrom"
+                           placeholder="from" value={{ form.priceFrom.value }}>
+                    <label for="priceInTo" style="width: 20px"> - </label>
+                    <input name="priceTo" type="number" class="form-control form-control-sm" id="priceInTo"
+                           placeholder="to" value={{ form.priceTo.value }}/>
+                </div>
+                <div id="filter-form-date" class="form-inline" style="padding-top: 10px">
+                    <label for="dateInFrom" class="mr-sm-2">Date:</label>
+                    <input name="dateFrom" type="date" id="dateInFrom" placeholder="dd/mm/yyyy"
+                           data-date-format="dd/mm/yyyy"
+                           class="col-0 form-control form-control-sm"
+                           data-provide="datepicker-inline"
+                           value={{ form.dateFrom.value }}>
+                    <label for="dateInTo" style="width: 20px"> - </label>
+                    <input name="dateTo" type="date" id="dateInTo" placeholder="dd/mm/yyyy"
+                           data-date-format="dd/mm/yyyy"
+                           class="col-0 form-control form-control-sm"
+                           data-provide="datepicker-inline"
+                           value={{ form.dateTo.value }}>
+                </div>
+                <div id="filter-form-time" class="form-inline" style="padding-top: 10px">
+                    <label for="timeInFrom" class="mr-sm-2">Time:</label>
+                    <input name="timeFrom" type="time" id="timeInFrom" placeholder="hh:mm"
+                           class="col-0 form-control form-control-sm"
+                           value={{ form.timeFrom.value }}>
+                    <label for="timeInTo" style="width: 20px"> - </label>
+                    <input name="timeTo" type="time" id="timeInTo" placeholder="hh:mm"
+                           class="col-0 form-control form-control-sm"
+                           value={{ form.timeTo.value }}>
+                </div>
+                <div id="filter-form-category" class="form-inline">
+                    <label for="categoryInForm" class="mr-sm-2">Category:</label>
+                    {% for category in categories %}
+                        {% if not selected_categories or category not in selected_categories %}
+                            <button name="recCategory" value={{ category.id }} type="submit" class="btn btn-secondary"
+                                    style="margin-right: 5px; margin-top: 10px">{{ category.name }}
+                                <i class="fa fa-plus"></i></button>
+                        {% else %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div id="filter-form-selected_category" class="form-inline" style="padding-top: 10px">
+                    {% if selected_categories %}
+                        <label for="categoryInForm" class="mr-sm-2">Selected categories:</label>
+                        {% for categorie in selected_categories %}
+                            <button name="remCategory" value={{ categorie.id }} type="submit" class="btn btn-secondary"
+                                    style="margin-right: 5px; margin-top: 10px">{{ categorie.name }}
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div id="filter-form-monthly" class="form-inline" style="padding-top: 10px">
+                    {% if not in_monthly %}
+                        <button name="monthly" value=True type="submit" class="btn btn-secondary"
+                                style="margin-right: 5px; margin-top: 10px">Monthly
+                            <i class="fa fa-minus-square-o"></i>
+                        </button>
+                    {% elif in_monthly == "True" %}
+                        <button name="monthly" value=False type="submit" class="btn btn-secondary"
+                                style="margin-right: 5px; margin-top: 10px">Monthly
+                            <i class="fa fa-square"></i>
+                        </button>
+                    {% else %}
+                        <button name="monthly" type="submit" class="btn btn-secondary"
+                                style="margin-right: 5px; margin-top: 10px">Monthly
+                            <i class="fa fa-square-o"></i>
+                        </button>
+                    {% endif %}
+                </div>
+                <input class="btn btn-info" type="submit" value="Filer" style="margin-top: 10px; width: 70px">
+            </form>
+            <div id="filter-form-buttons" style="margin-top: 10px">
+                <form action="{% url 'budget/recent' %}" method="get">
+                    <input class="btn btn-warning" type="submit" value="Clear" style="width: 70px">
+                </form>
+            </div>
         {% endblock %}
     </div>
 {% endblock %}
