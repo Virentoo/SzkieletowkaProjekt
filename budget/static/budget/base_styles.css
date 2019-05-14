@@ -3,6 +3,13 @@
 
 }
 
+#filter_line_break {
+    width: 100%;
+    color: black;
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
 #priceInFrom, #priceInTo, #dateInFrom, #dateInTo, #timeInFrom, #timeInTo {
     width: 150px;
 }
@@ -20,14 +27,14 @@ div#upper {
 div#content {
     padding: 10px;
     float: left;
-    width: 70%;
+    width: 75%;
     min-height: 720px;
 }
 
 div#short_details {
     padding: 10px;
     float: left;
-    width: 30%;
+    width: 25%;
     min-height: 720px;
     background-color: aqua;
 }

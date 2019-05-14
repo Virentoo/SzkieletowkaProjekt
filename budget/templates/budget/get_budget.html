@@ -1,0 +1,15 @@
+{% load static %}
+
+{% if transaction_list %}
+    <ul>
+        {% for transaction in transaction_list %}
+            <li>Expense: {{ transaction.name }} </li>
+            Desc: {{ transaction.desc }} <br>
+            Price: {{ transaction.amount }} <br>
+            Date: {{ transaction.date }} <br>
+            <br>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No transactions are available.</p>
+{% endif %}
