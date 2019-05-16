@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Chart</title>
+</head>
+<body>
+  <div id="container" style="width:50%; height:100%;"></div>
+  <script src="https://code.highcharts.com/highcharts.src.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    var myChart = Highcharts.chart('container', {
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: 'Overall overview'
+        },
+        xAxis: {
+            categories: {{ categories|safe }}
+        },
+        yAxis: {
+            title: {
+                text: 'Money spend'
+            }
+        },
+        series: [{
+            name: 'Expanses(current month)',
+            data: {{sums_list_current}}
+        },
+        {
+          name: 'Expanses(previous month)',
+          data: {{sums_list_previous}}
+        }]
+    });
+});
+  </script>
+
+  
+</body>
+</html>
