@@ -36,6 +36,14 @@ def home(request):
     return render(request, 'budget/home.html')
 
 
+def new_expense(request):
+    return render(request, 'budget/new_expense.html')
+
+
+def new_income(request):
+    return render(request, 'budget/new_income.html')
+
+
 @login_required()
 def get_budget(request):
     if request.method != 'POST':
