@@ -83,5 +83,14 @@ def chart(request):
         'sums_list_previous' : sums_list_previous,
     })
 
+
 def home(request):
     return render(request, 'budget/home.html')
+
+
+def new_expense(request):
+    return render(request, 'budget/new_expense.html')
+
+
+def new_income(request):
+    return render(request, 'budget/new_income.html')

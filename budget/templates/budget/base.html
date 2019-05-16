@@ -15,18 +15,31 @@
 <body>
 
 <div id="container">
-    <div id="upper">
-        <table style="width: 100%">
-            <tr>
-                {% block upper_icon %}
-                {% endblock %}
-                {% block hello_user %}
-                    <th><h1 style="text-align: left">Witaj {{ user.username }}</h1></th>
-                    <th><p style="text-align: right">{{ date }}</p></th>
-                {% endblock %}
-            </tr>
-        </table>
-    </div>
+
+        <div id="menu">
+
+            <ul style="background-color: #333">
+
+                <li><a style="float: left; :hover=#111; font-family: Comic Sans MS,serif;" href="{% url 'home' %}">Budget app</a></li>
+
+                {% if user.is_authenticated %}
+                    <li><a style="float: right; :hover=#111" href="{% url 'profile' %}">Profile</a></li>
+                    <li><a style="float: right; :hover=#111" href="{% url 'logout' %}">Log Out</a></li>
+                    <li><a style="float: right; :hover=#111" href="{% url 'budget' %}">Budget</a></li>
+                {% else %}
+                    <li><a style="float: right; :hover=#111" class="active" href="{% url 'login' %}">Login</a></li>
+                    <li><a style="float: right; :hover=#111" href="{% url 'register' %}">Sign Up</a></li>
+
+                {% endif %}
+
+  		        <li><a style="float: right; :hover=#111" href="#contact">Contact</a></li>
+  		        <li><a style="float: right; :hover=#111" href="#about">About</a></li>
+
+            </ul>
+
+
+        </div>
+
     {% block content %}
         <div id="content">
             {% if messages %}
@@ -44,7 +57,7 @@
         {% endblock right %}
     {% endblock %}
     <div id="footer">
-        <h1>Footer!!!</h1>
+        <h5>All rights reserved</h5>
     </div>
 </div>
 </body>

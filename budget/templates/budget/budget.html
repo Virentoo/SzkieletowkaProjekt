@@ -44,15 +44,20 @@
 
 {% block right %}
     <div id="short_details">
-        <form action="{% url 'budget/new' %}" method="post">
+        <form action="{% url 'budget/new_income' %}" method="post">
             {% csrf_token %}
             <button class="btn btn-info" id="income_button" value="income" type="submit">Dodaj nowy
                 Income
             </button>
+        </form>
+
+        <form action="{% url 'budget/new_expense' %}" method="post">
+            {% csrf_token %}
             <button class="btn btn-info" id="expense_button" value="expense" type="submit">Dodaj
                 nowy Expense
             </button>
         </form>
+
         <hr>
         <form action="{% url 'budget/recent' %}" method="post">
             {% csrf_token %}
