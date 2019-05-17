@@ -150,9 +150,9 @@ def clear_filter(request):
 def delete(request):
     if request.method != 'POST':
         raise Http404("Nein")
-    id = request.POST.get('transaction_id')
+    id = request.POST.getlist('transaction_id')
     if not id:
         return HttpResponse("Wrong id")
-    Transaction.objects.filter(category__user=request.user, id=id).delete()
+    Transaction.objects.filter(category__user=request.user, id__in=id).delete()
     return HttpResponse("Success")
 

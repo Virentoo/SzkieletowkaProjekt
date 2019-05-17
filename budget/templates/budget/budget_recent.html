@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block content_middle %}
-    <div class="dropdown" style="margin-left: 50px">
+    <div id="upper_content_line" style="margin-left: 50px">
         <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Show recent
             <span class="caret"></span></button>
         <ul class="dropdown-menu">
@@ -207,22 +207,49 @@
             console.log(list);
             for (let i = 0, len = list.length; i < len; i++) {
                 const imgDelete = document.createElement('a');
+                const checkboxDelete = document.createElement('input');
                 const elementRoot = document.getElementsByClassName('budget_item')[i];
                 const id = list[i].dataset.id;
                 imgDelete.style = 'font-size: 30px; float: top; cursor: pointer';
                 imgDelete.innerHTML = '<i class="fa fa-trash-o"></i>';
                 imgDelete.onclick = ev => {
-                    remove_transaction(id);
+                    remove_transaction("&transaction_id=" + id);
                     elementRoot.remove();
                     if (document.getElementsByClassName('budget_item_icons').length === 0) {
                         document.getElementById('budget_output').innerText = "All transaction are gone!";
                     }
                 };
+                {#checkboxDelete.className = "budget_item_icons_checkbox";#}
+                {#checkboxDelete.type = "checkbox";#}
+                {#checkboxDelete.style = 'width: 20px';#}
+                {#checkboxDelete.dataset.id = id;#}
+                {#list[i].appendChild(checkboxDelete);#}
                 list[i].appendChild(imgDelete);
             }
+            const buttonRemSelected = document.createElement('button');
+            buttonRemSelected.innerHTML = 'Remove filtred <i class="fa fa-trash-o"></i>';
+            buttonRemSelected.id = 'upper_content_line_remove_selected_button';
+            buttonRemSelected.className = 'btn btn-danger';
+            buttonRemSelected.onclick = ev => {
+                var result = confirm("Remove all filtered transactions?");
+                if(result === false) return;
+                let trans = "";
+                for (let i = 0, len = list.length; i < len; i++) {
+                    trans += "&transaction_id=" + list[i].dataset.id;
+                }
+                const elementRoot = document.getElementById('budget_output');
+                while (elementRoot.firstChild) {
+                    elementRoot.removeChild(elementRoot.firstChild)
+                }
+                remove_transaction(trans);
+                elementRoot.innerText = "All transaction are gone!";
+
+            };
+            document.getElementById('upper_content_line').appendChild(buttonRemSelected);
         }
 
         function hideRemoveIcons() {
+            document.getElementById('upper_content_line_remove_selected_button').remove();
             var list = document.getElementsByClassName('budget_item_icons');
             for (let i = 0, len = list.length; i < len; i++) {
                 while (list[i].firstChild) {
@@ -233,8 +260,8 @@
 
         function onRemoveClick() {
             var list = document.getElementsByClassName('budget_item_icons');
-            if(list.length === 0 ) return;
-            if(list[0].hasChildNodes()) hideRemoveIcons();
+            if (list.length === 0) return;
+            if (list[0].hasChildNodes()) hideRemoveIcons();
             else showRemoveIcons();
         }
 
@@ -356,7 +383,7 @@
         function remove_transaction(transaction_id) {
             const filter = $('#filter-form');
             let data = filter.serialize();
-            data += "&transaction_id=" + transaction_id;
+            data += transaction_id;
             console.log(data);
             $.ajax({
                 type: 'POST',
