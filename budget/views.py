@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import FilterForm
 from .utils import convert_datetime
 from django.http import Http404
+from django.http import HttpResponse
 
 
 @login_required()
@@ -144,3 +145,14 @@ def clear_filter(request):
     if not request.is_ajax():
         return
     request.session['selected_categories'] = None
+
+
+def delete(request):
+    if request.method != 'POST':
+        raise Http404("Nein")
+    id = request.POST.get('transaction_id')
+    if not id:
+        return HttpResponse("Wrong id")
+    Transaction.objects.filter(category__user=request.user, id=id).delete()
+    return HttpResponse("Success")
+

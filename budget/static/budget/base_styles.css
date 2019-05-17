@@ -25,6 +25,18 @@ div#upper {
     padding: 15px;
 }
 
+.budget_item_desc {
+    border-radius: 10px;
+    background-color: #f2f2f2;
+    width: 95%;
+    min-width: 300px;
+    padding: 10px 20px;
+}
+
+.budget_spacer {
+    height: 10px;
+}
+
 div#content {
     padding: 10px 200px 10px 200px;
     float: left;
@@ -43,6 +55,7 @@ div#short_details {
     float: left;
     width: 25%;
     min-height: 720px;
+    height: available;
     background-color: aqua;
 }
 

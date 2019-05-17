@@ -2,7 +2,8 @@
 {% load static %}
 
 {% block head %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+          xmlns="http://www.w3.org/1999/html">
 {% endblock %}
 <body>
 {% block upper_icon %}
@@ -17,7 +18,7 @@
 {% endblock %}
 
 {% block content_middle %}
-    <div class="dropdown">
+    <div class="dropdown" style="margin-left: 50px">
         <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Show recent
             <span class="caret"></span></button>
         <ul class="dropdown-menu">
@@ -34,7 +35,7 @@
         </ul>
     </div>
     <br>
-    <div id="budget_output">
+    <div id="budget_output" style="height: 100%">
     </div>
 {% endblock %}
 
@@ -48,8 +49,8 @@
             </button>
         </form>
 
-         <form action="{% url 'budget/new_expense' %}" method="post">
-             {% csrf_token %}
+        <form action="{% url 'budget/new_expense' %}" method="post">
+            {% csrf_token %}
             <button class="btn btn-info" id="expense_button" value="expense" type="submit">Dodaj
                 nowy Expense
             </button>
@@ -127,7 +128,8 @@
                     </button>
                 </div>
                 <hr id="filter_line_break"/>
-                <div id="filter-form-sort" class="form-inline" style="padding: 5px">
+                <div id="filter-form-sort" style="padding: 5px">
+                    <label>Sort by </label>
                     <button id="filter-form-sort-text" class="btn btn-primary dropdown-toggle" type="button"
                             data-toggle="dropdown">Sort by
                     </button>
@@ -164,7 +166,8 @@
                        style="margin-top: 10px; width: 70px">
             </form>
             <div id="filter-form-buttons" style="margin-top: 10px">
-                <button class="btn btn-warning" style="width: 70px" onclick="clearFilter()">Clear</button>
+                <button class="btn btn-warning" style="width: 70px;" onclick="clearFilter()">Clear</button>
+                <button class="btn btn-danger" style="width: 100px" onclick="onRemoveClick()">Remove</button>
             </div>
         {% endblock %}
     </div>
@@ -197,6 +200,42 @@
             monthlyButton.onclick = function () {
                 on_monthly_button_click('')
             }
+        }
+
+        function showRemoveIcons() {
+            var list = document.getElementsByClassName('budget_item_icons');
+            console.log(list);
+            for (let i = 0, len = list.length; i < len; i++) {
+                const imgDelete = document.createElement('a');
+                const elementRoot = document.getElementsByClassName('budget_item')[i];
+                const id = list[i].dataset.id;
+                imgDelete.style = 'font-size: 30px; float: top; cursor: pointer';
+                imgDelete.innerHTML = '<i class="fa fa-trash-o"></i>';
+                imgDelete.onclick = ev => {
+                    remove_transaction(id);
+                    elementRoot.remove();
+                    if (document.getElementsByClassName('budget_item_icons').length === 0) {
+                        document.getElementById('budget_output').innerText = "All transaction are gone!";
+                    }
+                };
+                list[i].appendChild(imgDelete);
+            }
+        }
+
+        function hideRemoveIcons() {
+            var list = document.getElementsByClassName('budget_item_icons');
+            for (let i = 0, len = list.length; i < len; i++) {
+                while (list[i].firstChild) {
+                    list[i].removeChild(list[i].firstChild);
+                }
+            }
+        }
+
+        function onRemoveClick() {
+            var list = document.getElementsByClassName('budget_item_icons');
+            if(list.length === 0 ) return;
+            if(list[0].hasChildNodes()) hideRemoveIcons();
+            else showRemoveIcons();
         }
 
         function on_sort_changed(name, value) {
@@ -312,6 +351,18 @@
         function on_rem_category_button(text, value) {
             add_category_button(text, value);
             request_new_data('remCategory', value);
+        }
+
+        function remove_transaction(transaction_id) {
+            const filter = $('#filter-form');
+            let data = filter.serialize();
+            data += "&transaction_id=" + transaction_id;
+            console.log(data);
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'budget_delete' %}",
+                data: data,
+            });
         }
 
         function request_new_data(valueName, value) {
