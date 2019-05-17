@@ -26,7 +26,7 @@ div#upper {
 }
 
 div#content {
-    padding: 10px 200px 10px 200px;
+    padding: 60px 200px 60px 200px;
     float: left;
     width: 75%;
     min-height: 720px;
@@ -55,17 +55,25 @@ div#footer {
 
 ul {
   list-style-type: none;
+  text-decoration: none;
   margin: 0;
   padding: 0;
   overflow: hidden;
 }
 
 li a {
+
   display: block;
   color: white;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
+}
+
+li a:hover {
+  text-decoration: none;
+  background-color: #555;
+  color: white;
 }
 
 .button {

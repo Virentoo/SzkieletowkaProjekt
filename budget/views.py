@@ -1,6 +1,8 @@
 from django.shortcuts import render
+from django.urls import reverse
 from budget.models import Transaction, Category
 from django.contrib.auth.decorators import login_required
+from django.views.generic import CreateView
 from .forms import FilterForm
 from .utils import convert_datetime
 from django.http import Http404
@@ -36,10 +38,25 @@ def home(request):
     return render(request, 'budget/home.html')
 
 
+class NewTransactionView(CreateView):
+    model = Transaction
+    template_name = 'budget/new.html'
+    fields = ['name', 'desc', 'type', 'category', 'date', 'amount']
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('budget')
+
+
+@login_required()
 def new_expense(request):
-    return render(request, 'budget/new_expense.html')
+    return render(request, 'budget/new.html')
 
 
+@login_required()
 def new_income(request):
     return render(request, 'budget/new_income.html')
 
@@ -144,3 +161,5 @@ def clear_filter(request):
     if not request.is_ajax():
         return
     request.session['selected_categories'] = None
+
+
