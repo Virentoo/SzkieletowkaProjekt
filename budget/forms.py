@@ -14,3 +14,10 @@ class FilterForm(forms.Form):
     monthly2 = forms.CharField(required=False)
 
 
+
+
+
+
+
+
+
