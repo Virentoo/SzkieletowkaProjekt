@@ -20,4 +20,3 @@ class FilterForm(forms.Form):
 
 
 
-
