@@ -9,10 +9,17 @@
                     data-id="{{ transaction.id }}"></th>
                 <th style="font-weight: normal"
                     class="shadow-sm p-3 mb-5 bg-white budget_item_desc">
-                    <h6>Expense: {{ transaction.name }} </h6>
-                    Desc: {{ transaction.desc }} <br>
-                    Price: {{ transaction.amount }} <br>
-                    Date: {{ transaction.date }} <br>
+                    {% if transaction.type == 'expense' %}
+                        <h6>Expense: {{ transaction.name }} </h6>
+                        Desc: {{ transaction.desc }} <br>
+                        Price: {{ transaction.amount }} <br>
+                        Date: {{ transaction.date }} <br>
+                    {% else %}
+                        <h6>Income: {{ transaction.name }} </h6>
+                        Desc: {{ transaction.desc }} <br>
+                        Amount: {{ transaction.amount }} <br>
+                        Date: {{ transaction.date }} <br>
+                    {% endif %}
                 </th>
             </tr>
             <tr class="budget_spacer"></tr>

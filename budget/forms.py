@@ -11,7 +11,7 @@ class FilterForm(forms.Form):
     transaction_type = forms.CharField(required=False)
     recCategory = forms.CharField(required=False)
     remCategory = forms.CharField(required=False)
-    monthly2 = forms.CharField(required=False)
+    monthly2= forms.CharField(required=False)
 
 
 

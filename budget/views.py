@@ -11,15 +11,71 @@ from django.http import HttpResponse
 
 @login_required()
 def budget(request):
-    item_list = {}
     user = request.user
-    category_list = Category.objects.filter(user=user).order_by('-name')
-    context = {'category_list': category_list}
-    for item in category_list:
-        item_list[item] = (
-            Transaction.objects.filter(category=item))
-    context['item_list'] = item_list
+
+    context = {'categories': Category.objects.filter(user=user)}
+    if 'selected_categories' in request.session:
+        category_ses = request.session['selected_categories']
+        context['selected_categories'] = Category.objects.filter(pk__in=category_ses)
+
     return render(request, 'budget/budget.html', context)
+
+
+@login_required()
+def get_category_budget(request):
+    if request.method != 'POST':
+        raise Http404("Nein")
+
+    reset = request.POST.get('reset', False)
+    if reset:
+        del request.session['selected_categories']
+
+    user = request.user
+    sort_by = request.POST.get('sort_by', '1')
+    monthly = request.POST.get('monthly', '')
+    addCategory = request.POST.get('addCategory')
+    remCategory = request.POST.get('remCategory')
+
+    if sort_by == '1':
+        sort_by = 'name'
+    elif sort_by == '2':
+        sort_by = '-name'
+
+    context = {}
+
+    items_list = {}
+    category_list = Category.objects.filter(user=user).order_by(sort_by)
+
+    if addCategory:
+        if 'selected_categories' in request.session:
+            category_ses = request.session['selected_categories']
+        else:
+            category_ses = []
+        if addCategory not in category_ses:
+            category_ses.append(addCategory)
+            request.session['selected_categories'] = category_ses
+    elif remCategory:
+        category_ses = request.session['selected_categories']
+        if remCategory in category_ses:
+            category_ses.remove(remCategory)
+            request.session['selected_categories'] = category_ses
+    if 'selected_categories' in request.session:
+        category_ses = request.session['selected_categories']
+        context['selected_categories'] = Category.objects.filter(pk__in=category_ses)
+        if len(category_ses) > 0:
+            category_list = category_list.filter(id__in=category_ses)
+
+    if monthly != '':
+        category_list = category_list.filter(monthly=monthly)
+
+    for item in category_list:
+        items_list[item] = (
+            Transaction.objects.filter(category=item))
+
+    context['item_list'] = items_list
+    context['category_list'] = category_list
+
+    return render(request, 'budget/get_category_budget.html', context)
 
 
 @login_required()
@@ -42,6 +98,7 @@ def home(request):
 class NewTransactionView(CreateView):
     model = Transaction
     template_name = 'budget/new.html'
+
     fields = ['name', 'desc', 'type', 'category', 'date', 'amount']
 
     def form_valid(self, form):
@@ -79,7 +136,7 @@ def get_budget(request):
     if reset_filter and reset_filter == 'true' and 'selected_categories' in request.session:
         del request.session['selected_categories']
 
-    transaction_type = 1
+    transaction_type = 3
 
     transaction_list = Transaction.objects.filter(category__user=user)
     if in_monthly:
@@ -134,15 +191,16 @@ def get_budget(request):
         request.session.delete('selected_categories')
 
     context['form'] = form
+
     if in_monthly:
         context['in_monthly'] = in_monthly
+
     if transaction_type == 2:
         transaction_list = transaction_list.filter(type="expense")
     elif transaction_type == 1:
         transaction_list = transaction_list.filter(type="income")
 
     sort_by = request.POST.get('sort_by', '1')
-
     if sort_by == '1':
         transaction_list = transaction_list.order_by('-date')
     elif sort_by == '2':
@@ -173,3 +231,12 @@ def delete(request):
     Transaction.objects.filter(category__user=request.user, id__in=id).delete()
     return HttpResponse("Success")
 
+
+def delete_category(request):
+    if request.method != 'POST':
+        raise Http404("Nein")
+    id = request.POST['category_id']
+    if not id:
+        return HttpResponse("Wrong id")
+    Category.objects.filter(id__in=id).delete()
+    return HttpResponse("Success")
