@@ -17,18 +17,37 @@
 div#container {
     margin-left: auto;
     margin-right: auto;
+    background-color: #e1fcde;
 }
 
 div#upper {
-    background-color: antiquewhite;
+    background-color: #242582;
     padding: 15px;
 }
 
+.budget_item_desc {
+    border-radius: 10px;
+    background-color: #f2f2f2;
+    width: 95%;
+    min-width: 300px;
+    padding: 10px 20px;
+}
+
+.budget_spacer {
+    height: 10px;
+}
+
 div#content {
-    padding: 10px;
+    padding: 60px 200px 60px 200px;
     float: left;
     width: 75%;
     min-height: 720px;
+}
+
+div#rightbar {
+
+
+
 }
 
 div#short_details {
@@ -36,27 +55,58 @@ div#short_details {
     float: left;
     width: 25%;
     min-height: 720px;
+    height: available;
     background-color: aqua;
 }
 
 div#footer {
     clear: both;
-    padding: 10px;
+    padding: 5px;
     text-align: center;
-    background-color: aquamarine;
+    background-color: black;
 }
 
 ul {
   list-style-type: none;
+  text-decoration: none;
   margin: 0;
   padding: 0;
   overflow: hidden;
 }
 
 li a {
+
   display: block;
   color: white;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
 }
+
+li a:hover {
+  text-decoration: none;
+  background-color: #555;
+  color: white;
+}
+
+.button {
+  padding: 15px 25px;
+  font-size: 24px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+}
+
+.button:hover {background-color: #3e8e41}
+
+.button:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+

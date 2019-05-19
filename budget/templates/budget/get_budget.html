@@ -1,15 +1,30 @@
 {% load static %}
 
 {% if transaction_list %}
-    <ul>
-        {% for transaction in transaction_list %}
-            <li>Expense: {{ transaction.name }} </li>
-            Desc: {{ transaction.desc }} <br>
-            Price: {{ transaction.amount }} <br>
-            Date: {{ transaction.date }} <br>
-            <br>
-        {% endfor %}
-    </ul>
+    {% for transaction in transaction_list %}
+        <table class="budget_item">
+            <tr>
+                <th style="width: 50px; vertical-align: top"
+                    class="budget_item_icons "
+                    data-id="{{ transaction.id }}"></th>
+                <th style="font-weight: normal"
+                    class="shadow-sm p-3 mb-5 bg-white budget_item_desc">
+                    {% if transaction.type == 'expense' %}
+                        <h6>Expense: {{ transaction.name }} </h6>
+                        Desc: {{ transaction.desc }} <br>
+                        Price: {{ transaction.amount }} <br>
+                        Date: {{ transaction.date }} <br>
+                    {% else %}
+                        <h6>Income: {{ transaction.name }} </h6>
+                        Desc: {{ transaction.desc }} <br>
+                        Amount: {{ transaction.amount }} <br>
+                        Date: {{ transaction.date }} <br>
+                    {% endif %}
+                </th>
+            </tr>
+            <tr class="budget_spacer"></tr>
+        </table>
+    {% endfor %}
 {% else %}
-    <p>No transactions are available.</p>
+    <p style="margin-left: 50px">No transactions are available.</p>
 {% endif %}

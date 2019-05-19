@@ -1,64 +1,316 @@
 {% extends "budget/base.html" %}
+{% load static %}
 
 {% block head %}
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+          xmlns="http://www.w3.org/1999/html">
 {% endblock head %}
 
 {% block upper %}
 
+
 {% endblock %}
 
 {% block content_middle %}
-    {% if category_list %}
-        <ul>
-            {% for category in category_list %}
-                <div class="card">
-                    <div class="card-header">
-                        <a class="card-link" data-toggle="collapse"
-                           href="#collapse{{ forloop.counter }}">{{ category.name }}
-                            ({{ category.user.login }})
-                            {% if category.monthly %} | Monthly {% endif %}</a>
-                        <div id="collapse{{ forloop.counter }}" class="panel-collapse collapse show">
-                            {% load base_extra %}
-                            {% with item_list|get:category as cat_items %}
-                                <div class="panel-body">
-                                    {% for item in cat_items %}
-                                        {% if item.type == "expense" %}
-                                            - Wydatek: {{ item.name }}, Koszt: {{ item.amount }} <br>
-                                        {% elif item.type == "income" %}
-                                            - Wpływ: {{ item.name }}, Kwota: {{ item.amount }} <br>
-                                        {% endif %}
-                                        </div>
-                                    {% endfor %}
-                            {% endwith %}
-                        </div>
-                    </div>
-                </div>
-                <br>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No categories are available.</p>
-    {% endif %}
+    <div id="budget_output">
+
+    </div>
 {% endblock %}
 
 {% block right %}
     <div id="short_details">
         <form action="{% url 'budget/new' %}" method="post">
             {% csrf_token %}
-            <button class="btn btn-info" id="income_button" value="income" type="submit">Dodaj nowy
-                Income
-            </button>
-            <button class="btn btn-info" id="expense_button" value="expense" type="submit">Dodaj
-                nowy Expense
+            <button class="btn btn-info" id="new_button" value="new" type="submit">Dodaj Nową Transakcję
             </button>
         </form>
         <hr>
-        <form action="{% url 'budget/recent' %}" method="post">
+        <form action="{% url 'budget/new_category' %}" method="post">
             {% csrf_token %}
-            <button class="btn btn-info" name="expense_button" id="expense_button" value="expense" type="submit">
-                Show recent
+            <button class="btn btn-info" id="new_category_button" value="new_category_button" type="submit">Dodaj Nową Kategorię
             </button>
         </form>
+        <hr>
+        <form action="{% url 'budget/chart' %}" method="post">
+            {% csrf_token %}
+            <button class="btn btn-info" id="chart_button" value="chart_button" type="submit">Pokaż wykres
+            </button>
+        </form>
+
+
+        <hr>
+        <a href="{% url 'budget/recent' %}" class="btn btn-info">Show recent</a>
+        {% block short_details %}
+            <form name="filter_form" id="filter-form" method="post">
+                {% csrf_token %}
+                <div id="filter-form-category" class="form-inline" style="min-height: 48px; width: fit-content;">
+                </div>
+                <div id="filter-form-selected_category" class="form-inline" style="padding-top: 10px">
+                </div>
+                <hr id="filter_line_break"/>
+                <div id="filter-form-monthly" class="form-inline" style="padding: 5px">
+                    <button id="filter-form-monthly-button" class="btn btn-secondary"
+                            type="button">Monthly
+                        <i class="fa fa-minus-square-o"></i>
+                    </button>
+                </div>
+                <hr id="filter_line_break"/>
+                <div id="filter-form-sort" style="padding: 5px">
+                    <label>Sort by </label>
+                    <button id="filter-form-sort-text" class="btn btn-primary dropdown-toggle" type="button"
+                            data-toggle="dropdown">Sort by
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <button type="button" onclick="on_sort_changed('sort_by', 1)"
+                                    class="dropdown-item">Name asc
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" onclick="on_sort_changed('sort_by', 2)"
+                                    class="dropdown-item">name desc
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <hr id="filter_line_break"/>
+            </form>
+            <div id="filter-form-buttons" style="margin-top: 10px">
+                <button class="btn btn-warning" style="width: 70px;" onclick="clearFilter()">Clear</button>
+                <button class="btn btn-danger" style="width: 100px" onclick="onRemoveClick()">Remove</button>
+            </div>
+        {% endblock %}
+
     </div>
+    <script type="text/javascript">
+
+        request_new_data(null, null);
+        $("#filter-form").submit(function (e) {
+            e.preventDefault();
+            request_new_data(null, null);
+        });
+
+        createCategoriesButtons({{ categories|safe }});
+
+        sort_by = '';
+        if (sessionStorage['b_sort_by'] == null) {
+            sessionStorage['b_sort_by'] = '&sort_by=' + 1;
+            sort_by = '1';
+        } else {
+            sort_by = sessionStorage['b_sort_by'];
+        }
+        change_sort_by_button(sort_by);
+
+        const monthlyButton = document.getElementById('filter-form-monthly-button');
+        if (sessionStorage['b_monthly'] != null) {
+            var value = sessionStorage['b_monthly'];
+            change_monthly_button(value);
+            monthlyButton.onclick = function () {
+                on_monthly_button_click(value);
+            }
+        } else {
+            monthlyButton.onclick = function () {
+                on_monthly_button_click('')
+            }
+        }
+
+        function createCategoriesButtons(obj) {
+            obj.forEach(e => {
+                var id = e.pk;
+                var name = e.fields.name;
+                if (sessionStorage['b_selCategory' + id] == null) {
+                    add_category_button(name, id)
+                } else {
+                    remove_category_button(name, id);
+                }
+            })
+        }
+
+        function showRemoveIcons() {
+            var list = document.getElementsByClassName('budget_item_icons');
+            for (let i = 0, len = list.length; i < len; i++) {
+                const imgDelete = document.createElement('a');
+                const elementRoot = document.getElementsByClassName('budget_item')[i];
+                const id = list[i].dataset.id;
+                imgDelete.style = 'font-size: 30px; float: top; cursor: pointer';
+                imgDelete.innerHTML = '<i class="fa fa-trash-o"></i>';
+                imgDelete.onclick = ev => {
+                    const result = confirm("Remove this category with all transactions?");
+                    if (result === false) return;
+                    remove_category("&category_id=" + id);
+                    elementRoot.remove();
+                    if (document.getElementsByClassName('budget_item_icons').length === 0) {
+                        document.getElementById('budget_output').innerText = "All categories are gone!";
+                    }
+                };
+                list[i].appendChild(imgDelete);
+            }
+        }
+
+        function hideRemoveIcons() {
+            const list = document.getElementsByClassName('budget_item_icons');
+            for (let i = 0, len = list.length; i < len; i++) {
+                while (list[i].firstChild) {
+                    list[i].removeChild(list[i].firstChild);
+                }
+            }
+        }
+
+        function onRemoveClick() {
+            const list = document.getElementsByClassName('budget_item_icons');
+            if (list.length === 0) return;
+            if (list[0].hasChildNodes()) hideRemoveIcons();
+            else showRemoveIcons();
+        }
+
+        function on_sort_changed(name, value) {
+            sessionStorage['b_' + name] = "&" + name + "=" + value;
+            change_sort_by_button(value.toString());
+            request_new_data();
+        }
+
+        function clearFilter() {
+            let descendents = document.getElementById('filter-form-selected_category').children;
+            descendents = Array.prototype.slice.call(descendents);
+            descendents.forEach(value1 => {
+                document.getElementById(value1.name + value1.value).remove();
+                add_category_button(value1.name, value1.value);
+            });
+
+            for (let i = sessionStorage.length - 1; i >= 0; i--) {
+                if (!sessionStorage.key(i).startsWith('b_')) continue;
+                sessionStorage.removeItem(sessionStorage.key(i));
+            }
+
+            const filter = document.getElementById('filter-form');
+            filter.reset();
+            request_new_data('b_reset', true);
+            change_monthly_button('');
+            change_sort_by_button("1");
+        }
+
+        function change_monthly_button(monthlyValue) {
+            const monthlyButton = document.getElementById('filter-form-monthly-button');
+            let icon = '';
+            if (monthlyValue === 'True') icon = '<i class="fa fa-square"></i>';
+            else if (monthlyValue === 'False') icon = '<i class="fa fa-square-o"></i>';
+            else icon = '<i class="fa fa-minus-square-o"></i>';
+            monthlyButton.innerHTML = 'Monthly ' + icon;
+        }
+
+        function change_sort_by_button(value) {
+            sort_by_button = document.getElementById('filter-form-sort-text');
+            if (value === '1') {
+                sort_by_button.innerText = 'Name asc'
+            } else if (value === '2') {
+                sort_by_button.innerText = "Name desc"
+            }
+        }
+
+        function on_monthly_button_click(value) {
+            const button = document.getElementById('filter-form-monthly-button');
+            let newValue = "";
+            let newIcon = '';
+            if (value === 'True') {
+                newValue = 'False';
+                newIcon = '<i class="fa fa-square-o"></i>'
+            } else if (value === 'False') {
+                newValue = '';
+                newIcon = '<i class="fa fa-minus-square-o"></i>'
+            } else {
+                newValue = 'True';
+                newIcon = '<i class="fa fa-square"></i>'
+            }
+            button.innerHTML = 'Monthly ' + newIcon;
+            sessionStorage['b_monthly'] = "&monthly=" + newValue;
+            request_new_data();
+            button.onclick = function () {
+                on_monthly_button_click(newValue);
+            };
+        }
+
+        function remove_category_button(text, value) {
+            const button = document.createElement('button');
+            button.innerHTML = text + ' <i class="fa fa-minus"></i>';
+            button.id = text + value;
+            button.name = text;
+            button.value = value;
+            button.className = 'btn btn-secondary';
+            button.style = 'margin-right: 5px; margin-top: 5px';
+            button.addEventListener('click', function () {
+                on_rem_category_button(text, value);
+            });
+
+            const divv = document.getElementById('filter-form-selected_category');
+            divv.appendChild(button);
+        }
+
+        function add_category_button(text, value) {
+            var button = document.createElement('button');
+            button.innerHTML = text + ' <i class="fa fa-plus"></i>';
+            button.name = text;
+            button.value = value;
+            button.id = text + value;
+            button.className = "btn btn-secondary";
+            button.style = "margin-right: 5px; margin-top: 5px";
+            button.addEventListener('click', function () {
+                on_add_category_button(text, value);
+            });
+
+            const divv = document.getElementById('filter-form-category');
+            divv.appendChild(button);
+        }
+
+        function on_add_category_button(text, value) {
+            document.getElementById(text + value).remove();
+            remove_category_button(text, value);
+            sessionStorage['b_selCategory' + value] = '&selectedCategory=' + value;
+            request_new_data('addCategory', value);
+        }
+
+        function on_rem_category_button(text, value) {
+            document.getElementById(text + value).remove();
+            add_category_button(text, value);
+            sessionStorage.removeItem('b_selCategory' + value);
+            request_new_data();
+        }
+
+        function remove_category(category) {
+            const filter = $('#filter-form');
+            let data = filter.serialize();
+            data += category;
+            console.log(data);
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'budget_delete_category' %}",
+                data: data,
+            });
+        }
+
+        function request_new_data(valueName, value) {
+            const filter = $('#filter-form');
+            let data = filter.serialize();
+            for (let i = 0; i < sessionStorage.length; i++) {
+                if (!sessionStorage.key(i).startsWith('b_')) continue;
+                const sessionStorageVal = sessionStorage[sessionStorage.key(i)];
+
+                data += sessionStorageVal;
+            }
+
+            if (valueName != null) {
+                data += "&" + valueName + "=" + value;
+            }
+
+            console.log(data);
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'get_category_budget' %}",
+                data: data,
+                success: function (data) {
+                    document.getElementById('budget_output').innerHTML = data;
+                }
+            });
+        }
+
+    </script>
 {% endblock %}
