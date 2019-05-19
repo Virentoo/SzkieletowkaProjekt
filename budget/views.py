@@ -9,32 +9,55 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.utils import timezone
 import datetime
+from django.core import serializers
 
 
 @login_required()
 def budget(request):
-    item_list = {}
     user = request.user
-    category_list = Category.objects.filter(user=user).order_by('-name')
-    context = {'category_list': category_list}
-    for item in category_list:
-        item_list[item] = (
-            Transaction.objects.filter(category=item))
-    context['item_list'] = item_list
+
+    categories = Category.objects.filter(user=user)
+    categories_seri = serializers.serialize("json", categories)
+
+    context = {'categories': categories_seri}
+
     return render(request, 'budget/budget.html', context)
 
 
 @login_required()
-def budget_recent(request):
+def get_category_budget(request):
+    if request.method != 'POST':
+        raise Http404("Nein")
+
     user = request.user
+    monthly = request.POST.get('monthly', '')
+    sort_by = request.POST.get('sort_by', '1')
+    category_ses = request.POST.getlist('selectedCategory', [])
 
-    context = {'categories': Category.objects.filter(user=user)}
+    if sort_by == '1':
+        sort_by = 'name'
+    elif sort_by == '2':
+        sort_by = '-name'
 
-    if 'selected_categories' in request.session:
-        category_ses = request.session['selected_categories']
-        context['selected_categories'] = Category.objects.filter(pk__in=category_ses)
+    context = {}
 
-    return render(request, 'budget/budget_recent.html', context)
+    items_list = {}
+    category_list = Category.objects.filter(user=user).order_by(sort_by)
+
+    if len(category_ses) > 0:
+        category_list = category_list.filter(pk__in=category_ses)
+
+    if monthly != '':
+        category_list = category_list.filter(monthly=monthly)
+
+    for item in category_list:
+        items_list[item] = (
+            Transaction.objects.filter(category=item))
+
+    context['item_list'] = items_list
+    context['category_list'] = category_list
+
+    return render(request, 'budget/get_category_budget.html', context)
 
 
 def home(request):
@@ -78,44 +101,46 @@ class NewCategoryView(CreateView):
 
 
 @login_required()
+def budget_recent(request):
+    user = request.user
+
+    categories = Category.objects.filter(user=user)
+    categories_seri = serializers.serialize("json", categories)
+
+    context = {'categories': categories_seri}
+
+    return render(request, 'budget/budget_recent.html', context)
+
+
+@login_required()
 def get_budget(request):
     if request.method != 'POST':
         raise Http404("Nein")
 
-    in_monthly = request.POST.get('monthly')
-
-    if in_monthly == "":
-        in_monthly = None
-
+    in_monthly = request.POST.get('monthly', '')
+    sort_by = request.POST.get('sort_by', '1')
+    transaction_type = request.POST.get('transaction_type', 3)
     user = request.user
+
     context = {}
 
-    reset_filter = request.POST.get('reset')
-    if reset_filter and reset_filter == 'true' and 'selected_categories' in request.session:
-        del request.session['selected_categories']
-
-    transaction_type = 1
-
     transaction_list = Transaction.objects.filter(category__user=user)
-    if in_monthly:
+
+    if in_monthly != '':
         transaction_list = transaction_list.filter(category__monthly=in_monthly)
+
+    category_ses = request.POST.getlist('selectedCategory', [])
+    if len(category_ses) > 0:
+        transaction_list = transaction_list.filter(category__pk__in=category_ses)
 
     form = FilterForm(request.POST)
     if form.is_valid():
-        transaction_type_str = form.cleaned_data['transaction_type']
-        if transaction_type_str:
-            transaction_type = int(transaction_type_str)
-            request.session['transaction_type'] = transaction_type
-        elif 'transaction_type' in request.session:
-            transaction_type = request.session['transaction_type']
         priceFrom = form.cleaned_data['priceFrom']
         priceTo = form.cleaned_data['priceTo']
         dateFrom = form.cleaned_data['dateFrom']
         dateTo = form.cleaned_data['dateTo']
         timeFrom = form.cleaned_data['timeFrom']
         timeTo = form.cleaned_data['timeTo']
-        recCategory = form.cleaned_data['recCategory']
-        remCategory = form.cleaned_data['remCategory']
         datetimeFrom = convert_datetime(dateFrom, timeFrom)
         datetimeTo = convert_datetime(dateTo, timeTo)
         if priceFrom:
@@ -126,37 +151,18 @@ def get_budget(request):
             transaction_list = transaction_list.filter(date__gte=datetimeFrom)
         if datetimeTo:
             transaction_list = transaction_list.filter(date__lte=datetimeTo)
-        if recCategory:
-            if 'selected_categories' in request.session:
-                category_ses = request.session['selected_categories']
-            else:
-                category_ses = []
-            if recCategory not in category_ses:
-                category_ses.append(recCategory)
-                request.session['selected_categories'] = category_ses
-        elif remCategory:
-            category_ses = request.session['selected_categories']
-            if remCategory in category_ses:
-                category_ses.remove(remCategory)
-                request.session['selected_categories'] = category_ses
-        if 'selected_categories' in request.session:
-            category_ses = request.session['selected_categories']
-            context['selected_categories'] = Category.objects.filter(pk__in=category_ses)
-            if len(category_ses) > 0:
-                transaction_list = transaction_list.filter(category__pk__in=category_ses)
     else:
         form = FilterForm()
-        request.session.delete('selected_categories')
 
     context['form'] = form
+
     if in_monthly:
         context['in_monthly'] = in_monthly
+
     if transaction_type == 2:
         transaction_list = transaction_list.filter(type="expense")
     elif transaction_type == 1:
         transaction_list = transaction_list.filter(type="income")
-
-    sort_by = request.POST.get('sort_by', '1')
 
     if sort_by == '1':
         transaction_list = transaction_list.order_by('-date')
@@ -234,6 +240,3 @@ def chart(request):
         'sums_list_current' : sums_list_current,
         'sums_list_previous' : sums_list_previous,
     })
-
-
-
