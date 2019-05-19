@@ -195,6 +195,16 @@ def delete(request):
     return HttpResponse("Success")
 
 
+def delete_category(request):
+    if request.method != 'POST':
+        raise Http404("Nein")
+    id = request.POST['category_id']
+    if not id:
+        return HttpResponse("Wrong id")
+    Category.objects.filter(id__in=id).delete()
+    return HttpResponse("Success")
+
+
 @login_required()
 def chart(request):
     user = request.user
