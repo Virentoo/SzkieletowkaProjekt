@@ -52,6 +52,18 @@
             <button class="btn btn-info" id="new_button" value="new" type="submit">Dodaj Nową Transakcję
             </button>
         </form>
+        <hr>
+        <form action="{% url 'budget/new_category' %}" method="post">
+            {% csrf_token %}
+            <button class="btn btn-info" id="new_category_button" value="new_category_button" type="submit">Dodaj Nową Kategorię
+            </button>
+        </form>
+        <hr>
+        <form action="{% url 'budget/chart' %}" method="post">
+            {% csrf_token %}
+            <button class="btn btn-info" id="chart_button" value="chart_button" type="submit">Pokaż wykres
+            </button>
+        </form>
 
 
         <hr>

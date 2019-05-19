@@ -1,0 +1,30 @@
+{% extends "budget/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block head %}
+
+{% endblock head %}
+
+{% block upper %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="content-section"
+    id="content"
+    style="width: 100%; padding: 20px">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">New Category</legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Add</button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}
+
+{% block short_details %}
+{% endblock %}
