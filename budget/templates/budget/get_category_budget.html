@@ -1,0 +1,37 @@
+{% if category_list %}
+    {% for category in category_list %}
+        <table class="budget_item" style="width: 100%">
+            <tr>
+                <th style="width: 50px; vertical-align: top"
+                    class="budget_item_icons"
+                    data-id="{{ category.id }}"></th>
+                <th style="font-weight: normal">
+                    <div class="card">
+                        <div class="card-header">
+                            <a class="card-link" data-toggle="collapse"
+                               href="#collapse{{ forloop.counter }}">{{ category.name }}
+                                {% if category.monthly %} | Monthly {% endif %}</a>
+                            <div id="collapse{{ forloop.counter }}" class="panel-collapse collapse show">
+                                {% load base_extra %}
+                                {% with item_list|get:category as cat_items %}
+                                    <div class="panel-body">
+                                        {% for item in cat_items %}
+                                            {% if item.type == "expense" %}
+                                                - Wydatek: {{ item.name }}, Koszt: {{ item.amount }} <br>
+                                            {% elif item.type == "income" %}
+                                                - Wpływ: {{ item.name }}, Kwota: {{ item.amount }} <br>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                </th>
+            </tr>
+        </table>
+    {% endfor %}
+{% else %}
+    <p>No categories are available.</p>
+{% endif %}

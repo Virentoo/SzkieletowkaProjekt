@@ -23,13 +23,21 @@
             <span class="caret"></span></button>
         <ul class="dropdown-menu">
             <li>
-                <button onclick="request_new_data('transaction_type', 1)" class="dropdown-item">
+                <button name="transaction_id" onclick="transaction_type_changed('transaction_type', 1)"
+                        class="dropdown-item">
                     Income
                 </button>
             </li>
             <li>
-                <button onclick="request_new_data('transaction_type', 2)" class="dropdown-item">
+                <button name="transaction_id" onclick="transaction_type_changed('transaction_type', 2)"
+                        class="dropdown-item">
                     Expense
+                </button>
+            </li>
+            <li>
+                <button name="transaction_id" onclick="transaction_type_changed('transaction_type', 3)"
+                        class="dropdown-item">
+                    Both
                 </button>
             </li>
         </ul>
@@ -40,10 +48,9 @@
 {% endblock %}
 
 {% block right %}
-
     <div id="short_details">
         <form action="{% url 'budget/new' %}" method="post">
-             {% csrf_token %}
+            {% csrf_token %}
             <button class="btn btn-info" id="transaction_button" value="new" type="submit">Dodaj
                 nową Transakcjęgk
             </button>
@@ -88,31 +95,10 @@
                 </div>
                 <hr id="filter_line_break"/>
                 <div id="filter-form-category" class="form-inline" style="min-height: 48px; width: fit-content;">
-                    {% for category in categories %}
-                        {% if not selected_categories or category not in selected_categories %}
-                            <button name="recCategory"
-                                    onclick="on_add_category_button('{{ category.name }}',{{ category.id }})"
-                                    id="{{ category.name }}{{ category.id }}" class="btn btn-secondary"
-                                    name="{{ category.name }}" value="{{ category.id }}"
-                                    style="margin-right: 5px; margin-top: 5px">
-                                {{ category.name }}
-                                <i class="fa fa-plus"></i></button>
-                        {% else %}
-                        {% endif %}
-                    {% endfor %}
+
                 </div>
                 <div id="filter-form-selected_category" class="form-inline" style="padding-top: 10px">
-                    {% if selected_categories %}
-                        {% for categorie in selected_categories %}
-                            <button name="remCategory"
-                                    onclick="on_rem_category_button('{{ categorie.name }}',{{ categorie.id }})"
-                                    id="{{ categorie.name }}{{ categorie.id }}" class="btn btn-secondary"
-                                    name="{{ categorie.name }}" value="{{ categorie.id }}"
-                                    style="margin-right: 5px; margin-top: 5px">
-                                {{ categorie.name }}
-                                <i class="fa fa-minus"></i></button>
-                        {% endfor %}
-                    {% endif %}
+
                 </div>
                 <hr id="filter_line_break"/>
                 <div id="filter-form-monthly" class="form-inline" style="padding: 5px">
@@ -167,25 +153,28 @@
     </div>
 
     <script type="text/javascript">
-        request_new_data(null, null);
+        request_new_data();
+        console.log(sessionStorage);
+
         $("#filter-form").submit(function (e) {
             e.preventDefault();
-            request_new_data(null, null);
+            request_new_data();
         });
 
+        createCategoriesButtons({{ categories|safe }});
+
         sort_by = '';
-        console.log(sessionStorage['sort_by']);
-        if (sessionStorage['sort_by'] == null) {
-            sessionStorage['sort_by'] = 1;
-            sort_by = '1';
+        if (sessionStorage['br_sort_by'] != null) {
+            sort_by = sessionStorage['br_sort_by'];
         } else {
-            sort_by = sessionStorage['sort_by'];
+            sessionStorage['br_sort_by'] = '&sort_by=1';
+            sort_by = '1';
         }
         change_sort_by_button(sort_by);
 
         const monthlyButton = document.getElementById('filter-form-monthly-button');
-        if (sessionStorage['monthly'] != null) {
-            var value = sessionStorage['monthly'];
+        if (sessionStorage['br_monthly'] != null) {
+            var value = sessionStorage['br_monthly'];
             change_monthly_button(value);
             monthlyButton.onclick = function () {
                 on_monthly_button_click(value);
@@ -194,6 +183,23 @@
             monthlyButton.onclick = function () {
                 on_monthly_button_click('')
             }
+        }
+
+        function createCategoriesButtons(obj) {
+            obj.forEach(e => {
+                var id = e.pk;
+                var name = e.fields.name;
+                if (sessionStorage['br_selCategory' + id] == null) {
+                    add_category_button(name, id)
+                } else {
+                    remove_category_button(name, id);
+                }
+            })
+        }
+
+        function transaction_type_changed(text, value) {
+            sessionStorage['br_' + text] = '&' + text + '=' + value;
+            request_new_data()
         }
 
         function showRemoveIcons() {
@@ -226,7 +232,7 @@
             buttonRemSelected.className = 'btn btn-danger';
             buttonRemSelected.onclick = ev => {
                 var result = confirm("Remove all filtered transactions?");
-                if(result === false) return;
+                if (result === false) return;
                 let trans = "";
                 for (let i = 0, len = list.length; i < len; i++) {
                     trans += "&transaction_id=" + list[i].dataset.id;
@@ -260,20 +266,26 @@
         }
 
         function on_sort_changed(name, value) {
-            sessionStorage[name] = value;
+            sessionStorage['br_' + name] = "&" + name + "=" + value;
             change_sort_by_button(value.toString());
-            request_new_data(null, null);
+            request_new_data();
         }
 
         function clearFilter() {
             var descendents = document.getElementById('filter-form-selected_category').children;
             descendents = Array.prototype.slice.call(descendents);
             descendents.forEach(value1 => {
+                document.getElementById(value1.name + value1.value).remove();
                 add_category_button(value1.name, value1.value);
             });
-            console.log(descendents);
 
-            sessionStorage.clear();
+            for (let i = sessionStorage.length - 1; i >= 0; i--) {
+                var key = sessionStorage.key(i);
+                if (!key.startsWith('br_')) continue;
+                console.log("removing: " + key);
+                sessionStorage.removeItem(key);
+            }
+
             const filter = document.getElementById('filter-form');
             filter.reset();
             request_new_data('reset', true);
@@ -282,7 +294,7 @@
         }
 
         function change_monthly_button(monthlyValue) {
-            const monthlyButton = document.getElementById('filter-form-monthly-button')
+            const monthlyButton = document.getElementById('filter-form-monthly-button');
             let icon = '';
             if (monthlyValue === 'True') icon = '<i class="fa fa-square"></i>';
             else if (monthlyValue === 'False') icon = '<i class="fa fa-square-o"></i>';
@@ -306,7 +318,6 @@
         }
 
         function on_monthly_button_click(value) {
-            console.log();
             const button = document.getElementById('filter-form-monthly-button');
             let newValue = "";
             let newIcon = '';
@@ -321,16 +332,14 @@
                 newIcon = '<i class="fa fa-square"></i>'
             }
             button.innerHTML = 'Monthly ' + newIcon;
-            sessionStorage['monthly'] = newValue;
-            request_new_data(null, null);
+            sessionStorage['br_monthly'] = '&monthly=' + newValue;
+            request_new_data();
             button.onclick = function () {
                 on_monthly_button_click(newValue);
             };
         }
 
         function remove_category_button(text, value) {
-            document.getElementById(text + value).remove();
-
             var button = document.createElement('button');
             button.innerHTML = text + ' <i class="fa fa-minus"></i>';
             button.id = text + value;
@@ -347,8 +356,6 @@
         }
 
         function add_category_button(text, value) {
-            document.getElementById(text + value).remove();
-
             var button = document.createElement('button');
             button.innerHTML = text + ' <i class="fa fa-plus"></i>';
             button.name = text;
@@ -365,13 +372,17 @@
         }
 
         function on_add_category_button(text, value) {
+            document.getElementById(text + value).remove();
             remove_category_button(text, value);
-            request_new_data('recCategory', value);
+            sessionStorage['br_selCategory' + value] = '&selectedCategory=' + value;
+            request_new_data();
         }
 
         function on_rem_category_button(text, value) {
+            document.getElementById(text + value).remove();
             add_category_button(text, value);
-            request_new_data('remCategory', value);
+            sessionStorage.removeItem('br_selCategory' + value);
+            request_new_data();
         }
 
         function remove_transaction(transaction_id) {
@@ -389,13 +400,16 @@
         function request_new_data(valueName, value) {
             const filter = $('#filter-form');
             let data = filter.serialize();
+            for (let i = 0; i < sessionStorage.length; i++) {
+                if (!sessionStorage.key(i).startsWith('br_')) continue;
+                const sessionStorageVal = sessionStorage[sessionStorage.key(i)];
+                data += sessionStorageVal;
+            }
+
             if (valueName != null) {
                 data += "&" + valueName + "=" + value;
             }
-            for (let i = 0; i < sessionStorage.length; i++) {
-                const sessionStorageVal = sessionStorage[sessionStorage.key(i)];
-                data += "&" + sessionStorage.key(i) + "=" + sessionStorageVal;
-            }
+            console.log(sessionStorage);
             console.log(data);
             $.ajax({
                 type: 'POST',
@@ -408,4 +422,3 @@
         }
     </script>
 {% endblock %}
-
