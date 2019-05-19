@@ -1,9 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from budget.models import Transaction, Category
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView
-from .forms import FilterForm
+from .forms import FilterForm, NewTransactionForm
 from .utils import convert_datetime
 from django.http import Http404
 from django.http import HttpResponse
@@ -64,17 +64,37 @@ def home(request):
     return render(request, 'budget/home.html')
 
 
-class NewTransactionView(CreateView):
-    model = Transaction
-    template_name = 'budget/new.html'
-    fields = ['name', 'desc', 'type', 'category', 'date', 'amount']
+def new_transaction(request):
+    form = NewTransactionForm(request.POST)
+    user = request.user
 
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super().form_valid(form)
+    user_category = Category.objects.filter(user=user)
+    if form.is_valid():
+        form = form.save(commit=False)
+        form.save()
+        return render(request, 'budget/budget.html')
 
-    def get_success_url(self):
-        return reverse('budget')
+    context = {
+        'form': form,
+        'user_category': user_category
+
+    }
+
+    return render(request, 'budget/new.html', context)
+
+
+# class NewTransactionView(CreateView):
+#     model = Transaction
+#     template_name = 'budget/new.html'
+#     fields = ['name', 'desc', 'type', 'category', 'date', 'amount']
+#
+#     def form_valid(self, form):
+#         self.object.user = self.request.user
+#         form.instance.user = self.request.user
+#         return super().form_valid(form)
+#
+#     def get_success_url(self):
+#         return reverse('budget')
 
 
 @login_required()
