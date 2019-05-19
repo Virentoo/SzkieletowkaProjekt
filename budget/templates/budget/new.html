@@ -3,6 +3,9 @@
 
 {% block head %}
 
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+          xmlns="http://www.w3.org/1999/html">
+
 {% endblock head %}
 
 {% block upper %}
@@ -12,14 +15,43 @@
 {% block content %}
     <div class="content-section"
     id="content"
-    style="width: 100%; padding: 20px">
+    style="width: 100%; ">
         <form method="POST">
             {% csrf_token %}
-            <fieldset class="form-group">
-                <legend class="border-bottom mb-4">New transaction</legend>
-                {{ form|crispy }}
-            </fieldset>
             <div class="form-group">
+
+                Nazwa:
+                <input type="text" name="name">
+                <br/> <br/>
+
+                Opis:
+                <input type="text" name="description">
+                <br/> <br/>
+
+                Typ:
+                <select name="type">
+                    <option value="Income">Income</option>
+                    <option value="Expense">Expense</option>
+                </select>
+                <br/> <br/>
+
+                Kategoria:
+                <select name="category">
+                    {% for category in category_list %}
+                    <option>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+                <br/> <br/>
+
+                Data (rok-miesiąc-dzień godzina:minuta:sekunda)
+                <input type="datetime-local">
+                <br/> <br/>
+
+
+                Koszt:
+                <input type="number">
+                <br/> <br/>
+
                 <button class="btn btn-outline-info" type="submit">Add</button>
             </div>
         </form>
