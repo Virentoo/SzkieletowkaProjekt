@@ -4,7 +4,7 @@ from budget.models import Transaction, Category
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView
 from .forms import FilterForm
-from .utils import convert_datetime
+from .utils import convert_datetime, filter_transactions
 from django.http import Http404
 from django.http import HttpResponse
 from django.utils import timezone
@@ -117,64 +117,21 @@ def get_budget(request):
     if request.method != 'POST':
         raise Http404("Nein")
 
-    in_monthly = request.POST.get('monthly', '')
-    sort_by = request.POST.get('sort_by', '1')
-    transaction_type = request.POST.get('transaction_type', 3)
     user = request.user
 
     context = {}
 
     transaction_list = Transaction.objects.filter(category__user=user)
-
-    if in_monthly != '':
-        transaction_list = transaction_list.filter(category__monthly=in_monthly)
-
-    category_ses = request.POST.getlist('selectedCategory', [])
-    if len(category_ses) > 0:
-        transaction_list = transaction_list.filter(category__pk__in=category_ses)
+    transaction_list = filter_transactions(transaction_list, request.POST)
 
     form = FilterForm(request.POST)
-    if form.is_valid():
-        priceFrom = form.cleaned_data['priceFrom']
-        priceTo = form.cleaned_data['priceTo']
-        dateFrom = form.cleaned_data['dateFrom']
-        dateTo = form.cleaned_data['dateTo']
-        timeFrom = form.cleaned_data['timeFrom']
-        timeTo = form.cleaned_data['timeTo']
-        datetimeFrom = convert_datetime(dateFrom, timeFrom)
-        datetimeTo = convert_datetime(dateTo, timeTo)
-        if priceFrom:
-            transaction_list = transaction_list.filter(amount__gte=priceFrom)
-        if priceTo:
-            transaction_list = transaction_list.filter(amount__lte=priceTo)
-        if datetimeFrom:
-            transaction_list = transaction_list.filter(date__gte=datetimeFrom)
-        if datetimeTo:
-            transaction_list = transaction_list.filter(date__lte=datetimeTo)
-    else:
+    if not form.is_valid():
         form = FilterForm()
 
-    context['form'] = form
-
+    in_monthly = request.POST.get('monthly')
     if in_monthly:
         context['in_monthly'] = in_monthly
-
-    if transaction_type == 2:
-        transaction_list = transaction_list.filter(type="expense")
-    elif transaction_type == 1:
-        transaction_list = transaction_list.filter(type="income")
-
-    if sort_by == '1':
-        transaction_list = transaction_list.order_by('-date')
-    elif sort_by == '2':
-        transaction_list = transaction_list.order_by('date')
-    elif sort_by == '3':
-        transaction_list = transaction_list.order_by('-amount')
-    elif sort_by == '4':
-        transaction_list = transaction_list.order_by('amount')
-    elif sort_by == '5':
-        transaction_list = transaction_list.order_by('name')
-
+    context['form'] = form
     context['transaction_list'] = transaction_list
     return render(request, 'budget/get_budget.html', context)
 
@@ -213,6 +170,12 @@ def chart(request):
     categories = list()
     item_list = {}
 
+    # Tutaj najpierw pobieram liste wszystkich tranzacji uzytkownika
+    transaction_list = Transaction.objects.filter(category__user=user)
+    # A potem przefiltrowuje ją
+    # 'transaction_list' - list tranzakcji
+    transaction_list = filter_transactions(transaction_list, request.GET)
+
     for category in category_list:
         categories.append(category.name)
 
@@ -234,7 +197,8 @@ def chart(request):
             if i.type in ["expense", "Expense"]:
                 if i.date >= timezone.now() - datetime.timedelta(days=30):
                     sum_current += i.amount
-                if i.date <= timezone.now() - datetime.timedelta(days=30) and i.date >= timezone.now() - datetime.timedelta(days=60):
+                if i.date <= timezone.now() - datetime.timedelta(
+                        days=30) and i.date >= timezone.now() - datetime.timedelta(days=60):
                     sum_previous += i.amount
         sums_list_current.append(sum_current)
         sums_list_previous.append(sum_previous)
@@ -243,10 +207,10 @@ def chart(request):
         item_list[item] = (
             Transaction.objects.filter(category=item))
 
-    return render(request, 'budget/chart.html',{
+    return render(request, 'budget/chart.html', {
         'categories': categories,
         'categories_id': categories_id,
-        'item_list' : item_list,
-        'sums_list_current' : sums_list_current,
-        'sums_list_previous' : sums_list_previous,
+        'item_list': item_list,
+        'sums_list_current': sums_list_current,
+        'sums_list_previous': sums_list_previous,
     })

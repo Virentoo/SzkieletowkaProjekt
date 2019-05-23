@@ -58,6 +58,10 @@
                 nową Transakcjęgk
             </button>
         </form>
+        <br>
+        <button class="btn btn-info" id="charts_post_button" onclick="redirect_to_charts()" type="submit">Dodaj
+            Pokaż wykres
+        </button>
         <hr>
         {% block short_details %}
             <form name="filter_form" id="filter-form" method="post">
@@ -413,6 +417,30 @@
                 type: 'POST',
                 url: "{% url 'budget_delete' %}",
                 data: data,
+            });
+        }
+
+        function redirect_to_charts() {
+            const filter = $('#filter-form');
+            let data = filter.serialize();
+            for (let i = 0; i < sessionStorage.length; i++) {
+                if (!sessionStorage.key(i).startsWith('br_')) continue;
+                const sessionStorageVal = sessionStorage[sessionStorage.key(i)];
+                data += sessionStorageVal;
+            }
+            console.log(sessionStorage);
+            console.log(data);
+
+            window.location = 'http://127.0.0.1:8000/budget/chart?'+data;
+            {#a = window.location = "{% url 'budget/chart' %}/?" + data;#}
+            return;
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'budget/chart' %}",
+                data: data,
+                success: function (data) {
+                    document.getElementById('budget_output').innerHTML = data;
+                }
             });
         }
 
