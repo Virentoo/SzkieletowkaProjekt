@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block content_middle %}
-    <div id="upper_content_line" style="margin-left: 50px">
+    <div id="upper_content_line" class="form-inline" style="margin-left: 50px">
         <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Show recent
             <span class="caret"></span></button>
         <ul class="dropdown-menu">
@@ -41,6 +41,9 @@
                 </button>
             </li>
         </ul>
+        <i class="fa fa-search" style="margin-left: 20px" aria-hidden="true"></i>
+        <input class="form-control form-control-sm ml-3 w-75" type="text" placeholder="Search" aria-label="Search"
+               id="transaction_search" style="max-width: 400px;" onkeyup="searchTransactions()">
     </div>
     <br>
     <div id="budget_output" style="height: 100%">
@@ -194,6 +197,23 @@
                     remove_category_button(name, id);
                 }
             })
+        }
+
+        function searchTransactions() {
+            var input = document.getElementById("transaction_search");
+            var filter = input.value.toUpperCase();
+            var budget = document.getElementById("budget_output");
+            var trans = budget.getElementsByClassName("budget_item");
+
+            for (let i = 0; i < trans.length; i++) {
+                var el = trans[i].getElementsByTagName('h6')[0];
+                var text = el.textContent || el.innerText;
+                if (text.toUpperCase().indexOf(filter) > -1) {
+                    trans[i].style.display = "";
+                } else {
+                    trans[i].style.display = "none";
+                }
+            }
         }
 
         function transaction_type_changed(text, value) {

@@ -17,9 +17,9 @@
                                     <div class="panel-body">
                                         {% for item in cat_items %}
                                             {% if item.type == "expense" %}
-                                                - Wydatek: {{ item.name }}, Koszt: {{ item.amount }} <br>
+                                                - Wydatek: <b>{{ item.name }}</b>, Koszt: {{ item.amount }} <br>
                                             {% elif item.type == "income" %}
-                                                - Wpływ: {{ item.name }}, Kwota: {{ item.amount }} <br>
+                                                - Wpływ: <b>{{ item.name }}</b>, Kwota: {{ item.amount }} <br>
                                             {% endif %}
                                         {% endfor %}
                                     </div>
