@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block content_middle %}
-    <div id="upper_content_line" style="margin-left: 50px">
+    <div id="upper_content_line" class="form-inline" style="margin-left: 50px">
         <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Show recent
             <span class="caret"></span></button>
         <ul class="dropdown-menu">
@@ -41,6 +41,9 @@
                 </button>
             </li>
         </ul>
+        <i class="fa fa-search" style="margin-left: 20px" aria-hidden="true"></i>
+        <input class="form-control form-control-sm ml-3 w-75" type="text" placeholder="Search" aria-label="Search"
+               id="transaction_search" style="max-width: 400px;" onkeyup="searchTransactions()">
     </div>
     <br>
     <div id="budget_output" style="height: 100%">
@@ -55,6 +58,10 @@
                 nową Transakcjęgk
             </button>
         </form>
+        <br>
+        <button class="btn btn-info" id="charts_post_button" onclick="redirect_to_charts()" type="submit">Dodaj
+            Pokaż wykres
+        </button>
         <hr>
         {% block short_details %}
             <form name="filter_form" id="filter-form" method="post">
@@ -194,6 +201,23 @@
                     remove_category_button(name, id);
                 }
             })
+        }
+
+        function searchTransactions() {
+            var input = document.getElementById("transaction_search");
+            var filter = input.value.toUpperCase();
+            var budget = document.getElementById("budget_output");
+            var trans = budget.getElementsByClassName("budget_item");
+
+            for (let i = 0; i < trans.length; i++) {
+                var el = trans[i].getElementsByTagName('h6')[0];
+                var text = el.textContent || el.innerText;
+                if (text.toUpperCase().indexOf(filter) > -1) {
+                    trans[i].style.display = "";
+                } else {
+                    trans[i].style.display = "none";
+                }
+            }
         }
 
         function transaction_type_changed(text, value) {
@@ -393,6 +417,30 @@
                 type: 'POST',
                 url: "{% url 'budget_delete' %}",
                 data: data,
+            });
+        }
+
+        function redirect_to_charts() {
+            const filter = $('#filter-form');
+            let data = filter.serialize();
+            for (let i = 0; i < sessionStorage.length; i++) {
+                if (!sessionStorage.key(i).startsWith('br_')) continue;
+                const sessionStorageVal = sessionStorage[sessionStorage.key(i)];
+                data += sessionStorageVal;
+            }
+            console.log(sessionStorage);
+            console.log(data);
+
+            window.location = 'http://127.0.0.1:8000/budget/chart?'+data;
+            {#a = window.location = "{% url 'budget/chart' %}/?" + data;#}
+            return;
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'budget/chart' %}",
+                data: data,
+                success: function (data) {
+                    document.getElementById('budget_output').innerHTML = data;
+                }
             });
         }
 

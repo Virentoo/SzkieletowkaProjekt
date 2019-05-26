@@ -220,6 +220,12 @@ def chart_unfiltred(request):
     categories = list()
     item_list = {}
 
+    # Tutaj najpierw pobieram liste wszystkich tranzacji uzytkownika
+    transaction_list = Transaction.objects.filter(category__user=user)
+    # A potem przefiltrowuje ją
+    # 'transaction_list' - list tranzakcji
+    transaction_list = filter_transactions(transaction_list, request.GET)
+
     for category in category_list:
         categories.append(category.name)
 
@@ -241,7 +247,8 @@ def chart_unfiltred(request):
             if i.type in ["expense", "Expense"]:
                 if i.date >= timezone.now() - datetime.timedelta(days=30):
                     sum_current += i.amount
-                if i.date <= timezone.now() - datetime.timedelta(days=30) and i.date >= timezone.now() - datetime.timedelta(days=60):
+                if i.date <= timezone.now() - datetime.timedelta(
+                        days=30) and i.date >= timezone.now() - datetime.timedelta(days=60):
                     sum_previous += i.amount
         sums_list_current.append(sum_current)
         sums_list_previous.append(sum_previous)
