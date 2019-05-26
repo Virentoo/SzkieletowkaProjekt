@@ -31,7 +31,7 @@
             </button>
         </form>
         <hr>
-        <form action="{% url 'budget/chart' %}" method="post">
+        <form action="{% url 'budget/chart_unfiltred' %}" method="post">
             {% csrf_token %}
             <button class="btn btn-info" id="chart_button" value="chart_button" type="submit">Pokaż wykres
             </button>
