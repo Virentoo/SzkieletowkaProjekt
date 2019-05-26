@@ -19,38 +19,38 @@
                 <legend class="border-bottom mb-4">New transaction</legend>
             </fieldset>
 
-            Nazwa: <input type="text" name="name">
-            <br/>
-            <br/>
+{#            Nazwa: <input type="text" name="name">#}
+{#            <br/>#}
+{#            <br/>#}
+{##}
+{#            Opis: <input type="text" name="description"><br/>#}
+{#            <br/>#}
+{#            <br/>#}
+{##}
+{#            <select name="type">#}
+{#                <option value="income">Przychód</option>#}
+{#                <option value="expense">Wydatek</option>#}
+{#            </select>#}
+{#            <br/>#}
+{#            <br/>#}
+{##}
+{#            <select name="category">#}
+{#                {% for category in user_category %}#}
+{#                <option>{{ category.name }}</option>#}
+{#                {% endfor %}#}
+{#            </select>#}
+{#            <br/>#}
+{#            <br/>#}
+{##}
+{#            Data: <input type="datetime-locale" name="date">#}
+{#            <br/>#}
+{#            <br/>#}
+{##}
+{##}
+{#            Cena: <input type="number" name="price">#}
+{#            <br/>#}
 
-            Opis: <input type="text" name="description"><br/>
-            <br/>
-            <br/>
-
-            <select name="type">
-                <option value="income">Przychód</option>
-                <option value="expense">Wydatek</option>
-            </select>
-            <br/>
-            <br/>
-
-            <select name="category">
-                {% for category in user_category %}
-                <option>{{ category.name }}</option>
-                {% endfor %}
-            </select>
-            <br/>
-            <br/>
-
-            Data: <input type="datetime-locale" name="date">
-            <br/>
-            <br/>
-
-
-            Cena: <input type="number" name="price">
-            <br/>
-
-
+            {{ form.as_p }}
 
             <div class="form-group">
                 <button class="btn btn-outline-info" type="submit">Add</button>

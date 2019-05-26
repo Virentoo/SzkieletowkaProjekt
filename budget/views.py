@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404, render_to_response
 from django.urls import reverse
 from budget.models import Transaction, Category
 from django.contrib.auth.decorators import login_required
@@ -64,24 +64,52 @@ def home(request):
     return render(request, 'budget/home.html')
 
 
+# def new_transaction(request):
+#     form = NewTransactionForm(request.POST)
+#     user = request.user
+#
+#     user_category = Category.objects.filter(user=user)
+#     if form.is_valid():
+#         form = form.save(commit=False)
+#         form.save()
+#         return render(request, 'budget/budget.html')
+#
+#     context = {
+#         'form': form,
+#         'user_category': user_category
+#
+#     }
+#
+#     return render(request, 'budget/new.html', context)
+
+
 def new_transaction(request):
-    form = NewTransactionForm(request.POST)
-    user = request.user
+    if request.method  == 'POST':
+        form = NewTransactionForm(request.user, request.POST)
+        if form.is_valid():
+            transaction = form.save(commit=False)
+            transaction.user = request.user
+            transaction.save()
+            return render(request, 'budget/budget.html')
+    else:
+        form = NewTransactionForm(request.user)
+    return render(request, 'budget/new.html', {'form': form})
 
-    user_category = Category.objects.filter(user=user)
-    if form.is_valid():
-        form = form.save(commit=False)
-        form.save()
-        return render(request, 'budget/budget.html')
 
-    context = {
-        'form': form,
-        'user_category': user_category
 
-    }
-
-    return render(request, 'budget/new.html', context)
-
+# def new_transaction(request, category_id):
+#     categories = get_object_or_404(Category, id=category_id)
+#
+#     if request.POST:
+#         form = NewTransactionForm(request.POST, categories)
+#         if form.is_valid():
+#             form.save()
+#             return render(request, 'budget/budget.html')
+#         else:
+#             form = NewTransactionForm(categories)
+#
+#         return render_to_response('new.html', {'form': form, 'categories': categories})
+#
 
 # class NewTransactionView(CreateView):
 #     model = Transaction
@@ -96,15 +124,6 @@ def new_transaction(request):
 #     def get_success_url(self):
 #         return reverse('budget')
 
-
-@login_required()
-def new_expense(request):
-    return render(request, 'budget/new.html')
-
-
-@login_required()
-def new_income(request):
-    return render(request, 'budget/new_income.html')
 
 
 class NewCategoryView(CreateView):

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Transaction
+from .models import Transaction, Category
 
 
 class FilterForm(forms.Form):
@@ -12,6 +12,9 @@ class FilterForm(forms.Form):
 
 
 class NewTransactionForm(forms.ModelForm):
+
+    date = forms.DateTimeField(widget=forms.DateTimeInput)
+
     class Meta:
         model = Transaction
         fields = [
@@ -23,12 +26,16 @@ class NewTransactionForm(forms.ModelForm):
             'amount'
         ]
 
-    def clean(self, *args, **kwargs):
-        # amount = self.cleaned_data.get('amount')
-
-        # if amount < 0:
-        #     raise forms.ValidationError("Cena nie może być ujemna")
-        return super(NewTransactionForm, self).clean(*args, **kwargs)
+    def __init__(self, user, *args, **kwargs):
+        super(NewTransactionForm, self).__init__(*args, **kwargs)
+        self.fields['category'].queryset = Category.objects.filter(user=user)
+    #
+    # def clean(self, *args, **kwargs):
+    #     # amount = self.cleaned_data.get('amount')
+    #
+    #     # if amount < 0:
+    #     #     raise forms.ValidationError("Cena nie może być ujemna")
+    #     return super(NewTransactionForm, self).clean(*args, **kwargs)
 
 
 
