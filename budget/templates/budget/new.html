@@ -19,6 +19,21 @@
                 <legend class="border-bottom mb-4">New transaction</legend>
             </fieldset>
 
+            <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+              {{ form.date }}
+              <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+              </div>
+            </div>
+
+            <script>
+              $(function () {
+                $("#datetimepicker1").datetimepicker({
+                  format: 'DD/MM/YYYY HH:mm',
+                });
+              });
+            </script>
+
 {#            Nazwa: <input type="text" name="name">#}
 {#            <br/>#}
 {#            <br/>#}

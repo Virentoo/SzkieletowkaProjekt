@@ -1,5 +1,7 @@
 from django import forms
 from .models import Transaction, Category
+from .widgets import BootstrapDateTimePickerInput
+from tempus_dominus.widgets import DateTimePicker
 
 
 class FilterForm(forms.Form):
@@ -13,7 +15,7 @@ class FilterForm(forms.Form):
 
 class NewTransactionForm(forms.ModelForm):
 
-    date = forms.DateTimeField(widget=forms.DateTimeInput)
+    date = forms.DateTimeField(input_formats=['%d/%m/%Y %H:%M'], widget=BootstrapDateTimePickerInput())
 
     class Meta:
         model = Transaction
@@ -29,13 +31,27 @@ class NewTransactionForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         super(NewTransactionForm, self).__init__(*args, **kwargs)
         self.fields['category'].queryset = Category.objects.filter(user=user)
-    #
-    # def clean(self, *args, **kwargs):
-    #     # amount = self.cleaned_data.get('amount')
-    #
-    #     # if amount < 0:
-    #     #     raise forms.ValidationError("Cena nie może być ujemna")
-    #     return super(NewTransactionForm, self).clean(*args, **kwargs)
+
+    def clean(self):
+        cd = self.cleaned_data
+
+        amount = cd.get("amount")
+
+        if amount is not None:
+            if amount <= 0:
+                raise forms.ValidationError("Cena nie może być ujemna ani zerowa")
+
+        return cd
+
+
+class DateForm(forms.Form):
+    date = forms.DateTimeField(
+        input_formats=['%d/%m/%Y %H:%M'],
+        widget=forms.DateTimeInput(attrs={
+            'class': 'form-control datetimepicker-input',
+            'data-target': '#datetimepicker1'
+        })
+    )
 
 
 
