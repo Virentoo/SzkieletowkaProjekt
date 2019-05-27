@@ -14,9 +14,6 @@ class FilterForm(forms.Form):
 
 
 class NewTransactionForm(forms.ModelForm):
-
-    date = forms.DateTimeField(input_formats=['%d/%m/%Y %H:%M'], widget=BootstrapDateTimePickerInput())
-
     class Meta:
         model = Transaction
         fields = [
@@ -31,6 +28,13 @@ class NewTransactionForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         super(NewTransactionForm, self).__init__(*args, **kwargs)
         self.fields['category'].queryset = Category.objects.filter(user=user)
+        self.fields['date'] = forms.DateTimeField(
+            input_formats=['%d/%m/%Y %H:%M'],
+            widget=forms.DateTimeInput(attrs={
+                'class': 'form-control datetimepicker-input',
+                'data-target': '#datetimepicker1'
+            })
+        )
 
     def clean(self):
         cd = self.cleaned_data
@@ -52,9 +56,3 @@ class DateForm(forms.Form):
             'data-target': '#datetimepicker1'
         })
     )
-
-
-
-
-
-
