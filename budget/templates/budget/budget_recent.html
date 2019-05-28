@@ -243,16 +243,12 @@
                         document.getElementById('budget_output').innerText = "All transaction are gone!";
                     }
                 };
-                {#checkboxDelete.className = "budget_item_icons_checkbox";#}
-                {#checkboxDelete.type = "checkbox";#}
-                {#checkboxDelete.style = 'width: 20px';#}
-                {#checkboxDelete.dataset.id = id;#}
-                {#list[i].appendChild(checkboxDelete);#}
                 list[i].appendChild(imgDelete);
             }
             const buttonRemSelected = document.createElement('button');
             buttonRemSelected.innerHTML = 'Remove filtred <i class="fa fa-trash-o"></i>';
             buttonRemSelected.id = 'upper_content_line_remove_selected_button';
+            buttonRemSelected.style = 'margin-left:10px';
             buttonRemSelected.className = 'btn btn-danger';
             buttonRemSelected.onclick = ev => {
                 var result = confirm("Remove all filtered transactions?");
@@ -421,6 +417,11 @@
             });
         }
 
+        function submitEdiForm() {
+            document.getElementById('form_transaction').submit();
+            return false;
+        }
+
         function redirect_to_charts() {
             const filter = $('#filter-form');
             let data = filter.serialize();
@@ -432,7 +433,7 @@
             console.log(sessionStorage);
             console.log(data);
 
-            window.location = 'http://127.0.0.1:8000/budget/chart?'+data;
+            window.location = 'http://127.0.0.1:8000/budget/chart?' + data;
             {#a = window.location = "{% url 'budget/chart' %}/?" + data;#}
             return;
             $.ajax({

@@ -88,7 +88,7 @@ def new_income(request):
 
 
 def new_transaction(request):
-    if request.method  == 'POST':
+    if request.method == 'POST':
         form = NewTransactionForm(request.user, request.POST)
         if form.is_valid():
             transaction = form.save(commit=False)
@@ -185,9 +185,9 @@ def chart(request):
 
     transaction_list = Transaction.objects.filter(category__user=user)
     transaction_list = filter_transactions(transaction_list, request.GET)
-    
+
     for transaction in transaction_list:
-        if(transaction.category not in category_list):
+        if (transaction.category not in category_list):
             category_list.append(transaction.category)
 
     for category in category_list:
@@ -197,12 +197,11 @@ def chart(request):
     for category in category_list:
         categories_id.append(category.id)
 
-
     user_transactions = []
     for n in categories_id:
         transactions = list()
         for transaction in transaction_list:
-            if(n == transaction.category.id):
+            if (n == transaction.category.id):
                 transactions.append(transaction)
         user_transactions.append(transactions)
 
@@ -211,9 +210,8 @@ def chart(request):
         sum = 0
         for i in n:
             if i.type in ["expense", "Expense"]:
-                sum+=i.amount
+                sum += i.amount
         sums.append(sum)
-        
 
     for item in category_list:
         item_list[item] = (
@@ -270,10 +268,27 @@ def chart_unfiltred(request):
         item_list[item] = (
             Transaction.objects.filter(category=item))
 
-    return render(request, 'budget/chart_unfiltred.html',{
+    return render(request, 'budget/chart_unfiltred.html', {
         'categories': categories,
         'categories_id': categories_id,
-        'item_list' : item_list,
-        'sums_list_current' : sums_list_current,
-        'sums_list_previous' : sums_list_previous,
-})
+        'item_list': item_list,
+        'sums_list_current': sums_list_current,
+        'sums_list_previous': sums_list_previous,
+    })
+
+
+def edit(request):
+    transaction_id = request.POST.get('transaction_id')
+    transaction = Transaction.objects.filter(category__user=request.user, pk=transaction_id)[0]
+    # if not transaction_id:
+    #     raise Http404('Wrong transaction id')
+    form = NewTransactionForm(request.user, request.POST)
+    if form.is_valid():
+        t = form.save(commit=False)
+        t.pk = transaction.pk
+        t.save()
+        return render(request, 'budget/budget.html')
+    else:
+        form = NewTransactionForm(request.user, instance=transaction)
+
+    return render(request, 'budget/new.html', {'form': form, 'transaction_id': transaction_id})

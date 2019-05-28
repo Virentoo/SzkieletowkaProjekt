@@ -1,5 +1,6 @@
 {% load static %}
 
+
 {% if transaction_list %}
     {% for transaction in transaction_list %}
         <table class="budget_item">
@@ -10,7 +11,13 @@
                 <th style="font-weight: normal"
                     class="shadow-sm p-3 mb-5 bg-white budget_item_desc">
                     {% if transaction.type == 'expense' %}
-                        <h6>Expense: {{ transaction.name }} </h6>
+                        <form id="form_transaction" action="{% url 'edit' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="transaction_id" value={{ transaction.id }}>
+                            <a href="#" onclick="return submitEdiForm()">
+                                <h6>Expense: {{ transaction.name }} </h6>
+                            </a>
+                        </form>
                         Desc: {{ transaction.desc }} <br>
                         Price: {{ transaction.amount }} <br>
                         Date: {{ transaction.date }} <br>
@@ -28,3 +35,5 @@
 {% else %}
     <p style="margin-left: 50px">No transactions are available.</p>
 {% endif %}
+
+
