@@ -3,7 +3,7 @@ from django.urls import reverse
 from budget.models import Transaction, Category
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView
-from .forms import FilterForm
+from .forms import FilterForm, NewTransactionForm
 from .utils import convert_datetime, filter_transactions
 from django.http import Http404
 from django.http import HttpResponse
@@ -64,17 +64,17 @@ def home(request):
     return render(request, 'budget/home.html')
 
 
-class NewTransactionView(CreateView):
-    model = Transaction
-    template_name = 'budget/new.html'
-    fields = ['name', 'desc', 'type', 'category', 'date', 'amount']
-
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse('budget')
+# class NewTransactionView(CreateView):
+#     model = Transaction
+#     template_name = 'budget/new.html'
+#     fields = ['name', 'desc', 'type', 'category', 'date', 'amount']
+#
+#     def form_valid(self, form):
+#         form.instance.user = self.request.user
+#         return super().form_valid(form)
+#
+#     def get_success_url(self):
+#         return reverse('budget')
 
 
 @login_required()
@@ -85,6 +85,19 @@ def new_expense(request):
 @login_required()
 def new_income(request):
     return render(request, 'budget/new_income.html')
+
+
+def new_transaction(request):
+    if request.method  == 'POST':
+        form = NewTransactionForm(request.user, request.POST)
+        if form.is_valid():
+            transaction = form.save(commit=False)
+            transaction.user = request.user
+            transaction.save()
+            return render(request, 'budget/budget.html')
+    else:
+        form = NewTransactionForm(request.user)
+    return render(request, 'budget/new.html', {'form': form})
 
 
 class NewCategoryView(CreateView):
