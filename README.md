@@ -21,7 +21,7 @@ Tomek:
 
 Igor:
 - Docker
-??Testy?? - zapytać prowadzącego ile ma być testów i do czego
+- Testy --- 25% funkcjonalności
 
 Kacper:
 - generowanie pdf
