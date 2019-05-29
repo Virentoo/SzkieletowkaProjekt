@@ -279,9 +279,9 @@ def chart_unfiltred(request):
 
 def edit(request):
     transaction_id = request.POST.get('transaction_id')
+    if not transaction_id:
+        raise Http404('Wrong transaction id')
     transaction = Transaction.objects.filter(category__user=request.user, pk=transaction_id)[0]
-    # if not transaction_id:
-    #     raise Http404('Wrong transaction id')
     form = NewTransactionForm(request.user, request.POST)
     if form.is_valid():
         t = form.save(commit=False)
@@ -291,4 +291,4 @@ def edit(request):
     else:
         form = NewTransactionForm(request.user, instance=transaction)
 
-    return render(request, 'budget/new.html', {'form': form, 'transaction_id': transaction_id})
+    return render(request, 'budget/edit.html', {'form': form, 'transaction_id': transaction_id})

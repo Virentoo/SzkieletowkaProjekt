@@ -14,13 +14,13 @@ class FilterForm(forms.Form):
 
 
 class NewTransactionForm(forms.ModelForm):
-    date = forms.DateTimeField(
-        input_formats=['%d/%m/%Y %H:%M'],
-        widget=forms.DateTimeInput(attrs={
-            'class': 'form-control datetimepicker-input',
-            'data-target': '#datetimepicker1'
-        })
-    )
+    date = forms.DateTimeField(localize=False,
+                               input_formats=['%d/%m %H:%M'],
+
+                               widget=forms.DateTimeInput(attrs={
+                                   'class': 'form-control datetimepicker-input',
+                                   'data-target': '#datetimepicker1'}, )
+                               )
 
     class Meta:
         model = Transaction
@@ -42,6 +42,7 @@ class NewTransactionForm(forms.ModelForm):
         self.fields['category'].label = "Kategoria"
         self.fields['date'].label = "Data"
         self.fields['amount'].label = "Kwota"
+
 
     def clean(self):
         cd = self.cleaned_data

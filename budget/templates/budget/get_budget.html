@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load l10n %}
 
 {% if transaction_list %}
     {% for transaction in transaction_list %}
@@ -20,12 +20,12 @@
                         </form>
                         Desc: {{ transaction.desc }} <br>
                         Price: {{ transaction.amount }} <br>
-                        Date: {{ transaction.date }} <br>
+                        Date: {{ transaction.date|localize }} <br>
                     {% else %}
                         <h6>Income: {{ transaction.name }} </h6>
                         Desc: {{ transaction.desc }} <br>
                         Amount: {{ transaction.amount }} <br>
-                        Date: {{ transaction.date }} <br>
+                        Date: {{ transaction.date|localize }} <br>
                     {% endif %}
                 </th>
             </tr>
