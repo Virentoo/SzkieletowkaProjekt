@@ -15,4 +15,5 @@ urlpatterns = [
     path('budget/get_categories_budget', views.get_category_budget, name='get_category_budget'),
     path('budget/delete_category', views.delete_category, name='budget_delete_category'),
     path('budget/edit/', views.edit, name='edit'),
+    path('budget/pdf', views.gen_pdf, name='pdf')
 ]

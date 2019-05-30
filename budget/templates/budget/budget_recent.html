@@ -59,8 +59,11 @@
             </button>
         </form>
         <br>
-        <button class="btn btn-info" id="charts_post_button" onclick="redirect_to_charts()" type="submit">Dodaj
+        <button class="btn btn-info" id="charts_post_button" onclick="redirect_to_charts()" type="submit">
             Pokaż wykres
+        </button>
+        <button class="btn btn-info" id="charts_post_button" onclick="gen_pdf()" type="submit">
+            Generuj plik PDF
         </button>
         <hr>
         {% block short_details %}
@@ -422,6 +425,20 @@
             return false;
         }
 
+        function gen_pdf() {
+            const filter = $('#filter-form');
+            let data = filter.serialize();
+            for (let i = 0; i < sessionStorage.length; i++) {
+                if (!sessionStorage.key(i).startsWith('br_')) continue;
+                const sessionStorageVal = sessionStorage[sessionStorage.key(i)];
+                data += sessionStorageVal;
+            }
+            console.log(sessionStorage);
+            console.log(data);
+
+            window.location = 'http://127.0.0.1:8000/budget/pdf?' + data;
+        }
+
         function redirect_to_charts() {
             const filter = $('#filter-form');
             let data = filter.serialize();
@@ -435,15 +452,6 @@
 
             window.location = 'http://127.0.0.1:8000/budget/chart?' + data;
             {#a = window.location = "{% url 'budget/chart' %}/?" + data;#}
-            return;
-            $.ajax({
-                type: 'POST',
-                url: "{% url 'budget/chart' %}",
-                data: data,
-                success: function (data) {
-                    document.getElementById('budget_output').innerHTML = data;
-                }
-            });
         }
 
         function request_new_data(valueName, value) {
