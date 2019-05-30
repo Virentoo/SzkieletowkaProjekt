@@ -172,7 +172,7 @@
 
         sort_by = '';
         if (sessionStorage['br_sort_by'] != null) {
-            sort_by = sessionStorage['br_sort_by'];
+            sort_by = sessionStorage['br_sort_by'].substring(9);;
         } else {
             sessionStorage['br_sort_by'] = '&sort_by=1';
             sort_by = '1';
@@ -181,7 +181,7 @@
 
         const monthlyButton = document.getElementById('filter-form-monthly-button');
         if (sessionStorage['br_monthly'] != null) {
-            var value = sessionStorage['br_monthly'];
+            var value = sessionStorage['br_monthly'].substring(9);
             change_monthly_button(value);
             monthlyButton.onclick = function () {
                 on_monthly_button_click(value);
@@ -434,16 +434,6 @@
             console.log(data);
 
             window.location = 'http://127.0.0.1:8000/budget/chart?' + data;
-            {#a = window.location = "{% url 'budget/chart' %}/?" + data;#}
-            return;
-            $.ajax({
-                type: 'POST',
-                url: "{% url 'budget/chart' %}",
-                data: data,
-                success: function (data) {
-                    document.getElementById('budget_output').innerHTML = data;
-                }
-            });
         }
 
         function request_new_data(valueName, value) {
