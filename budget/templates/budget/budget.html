@@ -43,6 +43,9 @@
             <button class="btn btn-info" id="chart_button" value="chart_button" type="submit">Pokaż wykres
             </button>
         </form>
+        <button class="btn btn-info" id="charts_post_button" onclick="gen_pdf()" type="submit">
+            Generuj plik PDF
+        </button>
 
 
         <hr>
@@ -297,6 +300,20 @@
             add_category_button(text, value);
             sessionStorage.removeItem('b_selCategory' + value);
             request_new_data();
+        }
+
+        function gen_pdf() {
+            const filter = $('#filter-form');
+            let data = filter.serialize();
+            for (let i = 0; i < sessionStorage.length; i++) {
+                if (!sessionStorage.key(i).startsWith('br_')) continue;
+                const sessionStorageVal = sessionStorage[sessionStorage.key(i)];
+                data += sessionStorageVal;
+            }
+            console.log(sessionStorage);
+            console.log(data);
+
+            window.location = 'http://127.0.0.1:8000/budget/pdf?' + data;
         }
 
         function remove_category(category) {
