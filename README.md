@@ -25,5 +25,5 @@ Igor:
 
 Kacper:
 - generowanie pdf
-- edycja transakcji
--!poprawienie przeszukiwania (do obgadania)
+- edycja transakcji (Gotowe)
+- !poprawienie przeszukiwania (do obgadania)
