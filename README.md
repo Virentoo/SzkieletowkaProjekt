@@ -29,4 +29,4 @@ Kacper:
 - !poprawienie przeszukiwania (do obgadania)
 
 Pakiety:
-reportlab - Generowanie PDF
+- reportlab - Generowanie PDF
