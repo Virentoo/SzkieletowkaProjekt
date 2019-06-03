@@ -14,6 +14,8 @@ from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from django.utils import formats
+from django.db.models import Sum
 
 
 @login_required()
@@ -313,26 +315,101 @@ def gen_pdf(request):
     x = 0
     topy = 800
     y = 800
+    footSize = 50
     pdf.translate(x, topy)
     pdf.setFont("Times-Roman", 20)
-    pdf.drawCentredString(2.75 * inch, 0, "Home Budget")
-    addspacing = 20 * 1.4
+    pdf.drawCentredString(4 * inch, 0, "Home Budget")
+    addspacing = 20 * 1.4 + 20
     y -= addspacing
     pdf.translate(inch, -addspacing)
 
-    for transaction in transaction_list:
+    income_list = transaction_list.filter(type='income')
+    expense_list = transaction_list.filter(type='expense')
+
+    pdf.setFont('Calibri', 20)
+    pdf.drawString(-inch / 2, 0, 'Ogólne statystyki')
+    pdf.rect(-inch, -5, 4 * inch, 2, fill=1)
+    addspacing = 25 * 1.4
+    y -= addspacing
+    pdf.translate(0, -addspacing)
+
+    textobject = pdf.beginText()
+    sumIncome = income_list.aggregate(Sum('amount')).get('amount__sum', 0)
+    if not sumIncome:
+        sumIncome = 0
+    sumExpense = expense_list.aggregate(Sum('amount')).get('amount__sum', 0)
+    if not sumExpense:
+        sumExpense = 0
+    textobject.setFont('Calibri', 12)
+    textobject.textLine('Liczba wszystkich tranzakcji: %d' % len(transaction_list))
+    textobject.textLine('Liczba wydatków: %d' % len(expense_list))
+    textobject.textLine('Liczba przychodów: %d' % len(income_list))
+    textobject.textLine('Suma wydanych pieniędzy: %dzł' % sumExpense)
+    textobject.textLine('Suma wpłyniętych pieniędzy: %dzł' % sumIncome)
+    textobject.textLine('Bilans: %dzł' % (sumIncome - sumExpense))
+    pdf.drawText(textobject)
+    objsize = -(textobject.getY() - 20)
+    y -= objsize
+    pdf.translate(0, -objsize)
+
+    if len(income_list) > 0:
+        pdf.setFont('Calibri', 20)
+        pdf.drawString(-inch / 2, 0, 'Przychody')
+        pdf.rect(-inch, -5, 4 * inch, 2, fill=1)
+        addspacing = 25 * 1.4
+        y -= addspacing
+        pdf.translate(0, -addspacing)
+
+    i = 0
+    for transaction in income_list:
+        i += 1
         textobject = pdf.beginText()
         textobject.setFont("Calibri", 16)
-        textobject.textLine(transaction.name)
+        textobject.textLine("%d. %s" % (i, transaction.name))
         textobject.setFont("Calibri", 12)
         textobject.textLine("Kategoria: %s" % transaction.category.name)
-        textobject.textLine("Data: %s" % transaction.date)
-        textobject.textLine("Cena: %s" % transaction.amount)
+        textobject.textLine(
+            "Data: %s %s" % (formats.date_format(transaction.date), formats.time_format(transaction.date)))
+        textobject.textLine("Ilość: %s" % transaction.amount)
         textobject.textLine("Opis: %s" % transaction.desc)
         # Move origin about textobject height and additional spacing
         objsize = -(textobject.getY() - 20 * 1.2)
         y -= objsize
-        if y < 0:
+        if y - footSize < 0:
+            pdf.showPage()
+            pdf.translate(inch, topy)
+            y = topy
+        pdf.drawText(textobject)
+        pdf.translate(0, -objsize)
+
+    if y - inch - footSize < 0:
+        pdf.showPage()
+        pdf.translate(inch, topy)
+        y = topy
+    if len(expense_list) > 0:
+        pdf.setFont('Calibri', 20)
+        pdf.drawString(-inch / 2, 0, 'Wydatki')
+        pdf.rect(-inch, -5, 4 * inch, 2, fill=1)
+        addspacing = 25 * 1.4
+        y -= addspacing
+        pdf.translate(0, -addspacing)
+
+    i = 0
+    for transaction in expense_list:
+        i += 1
+        textobject = pdf.beginText()
+        textobject.setFont("Calibri", 16)
+        textobject.textLine("%d. %s" % (i, transaction.name))
+        textobject.setFont("Calibri", 12)
+        textobject.textLine("Kategoria: %s" % transaction.category.name)
+        textobject.textLine(
+            "Data: %s %s" % (formats.date_format(transaction.date), formats.time_format(transaction.date)))
+        textobject.textLine("Cena: %s" % transaction.amount)
+        textobject.textLine("Opis: %s" % transaction.desc)
+        # Move origin about textobject height and additional spacing
+        objsize = -(textobject.getY() - 25 * 1.2)
+        y -= objsize
+        if y - footSize < 0:
             pdf.showPage()
             pdf.translate(inch, topy)
             y = topy
