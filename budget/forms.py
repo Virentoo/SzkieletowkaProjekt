@@ -1,7 +1,5 @@
 from django import forms
 from .models import Transaction, Category
-from .widgets import BootstrapDateTimePickerInput
-from tempus_dominus.widgets import DateTimePicker
 
 
 class FilterForm(forms.Form):
