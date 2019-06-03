@@ -24,6 +24,9 @@ Igor:
 - Testy --- 25% funkcjonalności
 
 Kacper:
-- generowanie pdf
+- generowanie pdf (Gotowe)
 - edycja transakcji (Gotowe)
 - !poprawienie przeszukiwania (do obgadania)
+
+Pakiety:
+- reportlab - Generowanie PDF
