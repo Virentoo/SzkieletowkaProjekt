@@ -30,3 +30,4 @@ Kacper:
 
 Pakiety:
 - reportlab - Generowanie PDF
+- crispyforms
