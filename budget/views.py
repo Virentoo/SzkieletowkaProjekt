@@ -16,6 +16,10 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from django.utils import formats
 from django.db.models import Sum
+from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
+from django.conf import settings
+import reportlab
 
 
 @login_required()
@@ -301,6 +305,7 @@ def edit(request):
 
 
 def gen_pdf(request):
+    reportlab.rl_config.TTFSearchPath.append(str(settings.BASE_DIR) + '/budget/static/budget')
     pdfmetrics.registerFont(TTFont('Calibri', 'Calibri.ttf'))
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=budget.pdf'
