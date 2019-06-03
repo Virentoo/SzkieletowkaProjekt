@@ -10,6 +10,12 @@ from django.http import HttpResponse
 from django.utils import timezone
 import datetime
 from django.core import serializers
+from reportlab.lib.units import inch
+from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from django.utils import formats
+from django.db.models import Sum
 
 
 @login_required()
@@ -88,7 +94,7 @@ def new_income(request):
 
 
 def new_transaction(request):
-    if request.method  == 'POST':
+    if request.method == 'POST':
         form = NewTransactionForm(request.user, request.POST)
         if form.is_valid():
             transaction = form.save(commit=False)
@@ -179,6 +185,54 @@ def delete_category(request):
 def chart(request):
     user = request.user
     user_id = user.id
+    category_list = list()
+    categories = list()
+    item_list = {}
+
+    transaction_list = Transaction.objects.filter(category__user=user)
+    transaction_list = filter_transactions(transaction_list, request.GET)
+
+    for transaction in transaction_list:
+        if (transaction.category not in category_list):
+            category_list.append(transaction.category)
+
+    for category in category_list:
+        categories.append(category.name)
+
+    categories_id = list()
+    for category in category_list:
+        categories_id.append(category.id)
+
+    user_transactions = []
+    for n in categories_id:
+        transactions = list()
+        for transaction in transaction_list:
+            if (n == transaction.category.id):
+                transactions.append(transaction)
+        user_transactions.append(transactions)
+
+    sums = []
+    for n in user_transactions:
+        sum = 0
+        for i in n:
+            if i.type in ["expense", "Expense"]:
+                sum += i.amount
+        sums.append(sum)
+
+    for item in category_list:
+        item_list[item] = (
+            Transaction.objects.filter(category=item))
+
+    return render(request, 'budget/chart.html', {
+        'categories': categories,
+        'sums': sums,
+    })
+
+
+@login_required()
+def chart_unfiltred(request):
+    user = request.user
+    user_id = user.id
     category_list = Category.objects.filter(user=user).order_by('-name')
     categories = list()
     item_list = {}
@@ -220,10 +274,148 @@ def chart(request):
         item_list[item] = (
             Transaction.objects.filter(category=item))
 
-    return render(request, 'budget/chart.html', {
+    return render(request, 'budget/chart_unfiltred.html', {
         'categories': categories,
         'categories_id': categories_id,
         'item_list': item_list,
         'sums_list_current': sums_list_current,
         'sums_list_previous': sums_list_previous,
     })
+
+
+def edit(request):
+    transaction_id = request.POST.get('transaction_id')
+    if not transaction_id:
+        raise Http404('Wrong transaction id')
+    transaction = Transaction.objects.filter(category__user=request.user, pk=transaction_id)[0]
+    form = NewTransactionForm(request.user, request.POST)
+    if form.is_valid():
+        t = form.save(commit=False)
+        t.pk = transaction.pk
+        t.save()
+        return render(request, 'budget/budget.html')
+    else:
+        form = NewTransactionForm(request.user, instance=transaction)
+
+    return render(request, 'budget/edit.html', {'form': form, 'transaction_id': transaction_id})
+
+
+def gen_pdf(request):
+    pdfmetrics.registerFont(TTFont('Calibri', 'Calibri.ttf'))
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename=budget.pdf'
+
+    user = request.user
+
+    transaction_list = Transaction.objects.filter(category__user=user)
+    transaction_list = filter_transactions(transaction_list, request.GET)
+
+    pdf = canvas.Canvas(response)
+
+    x = 0
+    topy = 800
+    y = 800
+    footSize = 50
+    pdf.translate(x, topy)
+    pdf.setFont("Times-Roman", 20)
+    pdf.drawCentredString(4 * inch, 0, "Home Budget")
+    addspacing = 20 * 1.4 + 20
+    y -= addspacing
+    pdf.translate(inch, -addspacing)
+
+    income_list = transaction_list.filter(type='income')
+    expense_list = transaction_list.filter(type='expense')
+
+    pdf.setFont('Calibri', 20)
+    pdf.drawString(-inch / 2, 0, 'Ogólne statystyki')
+    pdf.rect(-inch, -5, 4 * inch, 2, fill=1)
+    addspacing = 25 * 1.4
+    y -= addspacing
+    pdf.translate(0, -addspacing)
+
+    textobject = pdf.beginText()
+    sumIncome = income_list.aggregate(Sum('amount')).get('amount__sum', 0)
+    if not sumIncome:
+        sumIncome = 0
+    sumExpense = expense_list.aggregate(Sum('amount')).get('amount__sum', 0)
+    if not sumExpense:
+        sumExpense = 0
+    textobject.setFont('Calibri', 12)
+    textobject.textLine('Liczba wszystkich tranzakcji: %d' % len(transaction_list))
+    textobject.textLine('Liczba wydatków: %d' % len(expense_list))
+    textobject.textLine('Liczba przychodów: %d' % len(income_list))
+    textobject.textLine('Suma wydanych pieniędzy: %dzł' % sumExpense)
+    textobject.textLine('Suma wpłyniętych pieniędzy: %dzł' % sumIncome)
+    textobject.textLine('Bilans: %dzł' % (sumIncome - sumExpense))
+    pdf.drawText(textobject)
+    objsize = -(textobject.getY() - 20)
+    y -= objsize
+    pdf.translate(0, -objsize)
+
+    if len(income_list) > 0:
+        pdf.setFont('Calibri', 20)
+        pdf.drawString(-inch / 2, 0, 'Przychody')
+        pdf.rect(-inch, -5, 4 * inch, 2, fill=1)
+        addspacing = 25 * 1.4
+        y -= addspacing
+        pdf.translate(0, -addspacing)
+
+    i = 0
+    for transaction in income_list:
+        i += 1
+        textobject = pdf.beginText()
+        textobject.setFont("Calibri", 16)
+        textobject.textLine("%d. %s" % (i, transaction.name))
+        textobject.setFont("Calibri", 12)
+        textobject.textLine("Kategoria: %s" % transaction.category.name)
+        textobject.textLine(
+            "Data: %s %s" % (formats.date_format(transaction.date), formats.time_format(transaction.date)))
+        textobject.textLine("Ilość: %s" % transaction.amount)
+        textobject.textLine("Opis: %s" % transaction.desc)
+        # Move origin about textobject height and additional spacing
+        objsize = -(textobject.getY() - 20 * 1.2)
+        y -= objsize
+        if y - footSize < 0:
+            pdf.showPage()
+            pdf.translate(inch, topy)
+            y = topy
+        pdf.drawText(textobject)
+        pdf.translate(0, -objsize)
+
+    if y - inch - footSize < 0:
+        pdf.showPage()
+        pdf.translate(inch, topy)
+        y = topy
+    if len(expense_list) > 0:
+        pdf.setFont('Calibri', 20)
+        pdf.drawString(-inch / 2, 0, 'Wydatki')
+        pdf.rect(-inch, -5, 4 * inch, 2, fill=1)
+        addspacing = 25 * 1.4
+        y -= addspacing
+        pdf.translate(0, -addspacing)
+
+    i = 0
+    for transaction in expense_list:
+        i += 1
+        textobject = pdf.beginText()
+        textobject.setFont("Calibri", 16)
+        textobject.textLine("%d. %s" % (i, transaction.name))
+        textobject.setFont("Calibri", 12)
+        textobject.textLine("Kategoria: %s" % transaction.category.name)
+        textobject.textLine(
+            "Data: %s %s" % (formats.date_format(transaction.date), formats.time_format(transaction.date)))
+        textobject.textLine("Cena: %s" % transaction.amount)
+        textobject.textLine("Opis: %s" % transaction.desc)
+        # Move origin about textobject height and additional spacing
+        objsize = -(textobject.getY() - 25 * 1.2)
+        y -= objsize
+        if y - footSize < 0:
+            pdf.showPage()
+            pdf.translate(inch, topy)
+            y = topy
+        pdf.drawText(textobject)
+        pdf.translate(0, -objsize)
+
+    pdf.showPage()
+    pdf.save()
+    return response

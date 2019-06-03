@@ -38,11 +38,14 @@
             </button>
         </form>
         <hr>
-        <form action="{% url 'budget/chart' %}" method="post">
+        <form action="{% url 'budget/chart_unfiltred' %}" method="post">
             {% csrf_token %}
             <button class="btn btn-info" id="chart_button" value="chart_button" type="submit">Pokaż wykres
             </button>
         </form>
+        <button class="btn btn-info" id="charts_post_button" onclick="gen_pdf()" type="submit">
+            Generuj plik PDF
+        </button>
 
 
         <hr>
@@ -104,13 +107,13 @@
             sessionStorage['b_sort_by'] = '&sort_by=' + 1;
             sort_by = '1';
         } else {
-            sort_by = sessionStorage['b_sort_by'];
+            sort_by = sessionStorage['b_sort_by'].substring(8);
         }
         change_sort_by_button(sort_by);
 
         const monthlyButton = document.getElementById('filter-form-monthly-button');
         if (sessionStorage['b_monthly'] != null) {
-            var value = sessionStorage['b_monthly'];
+            var value = sessionStorage['b_monthly'].substring(8);
             change_monthly_button(value);
             monthlyButton.onclick = function () {
                 on_monthly_button_click(value);
@@ -297,6 +300,20 @@
             add_category_button(text, value);
             sessionStorage.removeItem('b_selCategory' + value);
             request_new_data();
+        }
+
+        function gen_pdf() {
+            const filter = $('#filter-form');
+            let data = filter.serialize();
+            for (let i = 0; i < sessionStorage.length; i++) {
+                if (!sessionStorage.key(i).startsWith('br_')) continue;
+                const sessionStorageVal = sessionStorage[sessionStorage.key(i)];
+                data += sessionStorageVal;
+            }
+            console.log(sessionStorage);
+            console.log(data);
+
+            window.location = 'http://127.0.0.1:8000/budget/pdf?' + data;
         }
 
         function remove_category(category) {

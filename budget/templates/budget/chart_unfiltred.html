@@ -26,13 +26,15 @@
         },
         series: [{
             name: 'Expanses(current month)',
-            data: {{sums}}
+            data: {{sums_list_current}}
+        },
+        {
+          name: 'Expanses(previous month)',
+          data: {{sums_list_previous}}
         }]
     });
 });
   </script>
 
-{{categories_id}}
-  
 </body>
 </html>

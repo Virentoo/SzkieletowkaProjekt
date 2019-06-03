@@ -28,6 +28,12 @@ def filter_transactions(transactions, post):
     datetimeFrom = convert_datetime(dateFrom, timeFrom)
     datetimeTo = convert_datetime(dateTo, timeTo)
 
+    # Transactions type
+    if transaction_type == '2':
+        transactions = transactions.filter(type="expense")
+    elif transaction_type == '1':
+        transactions = transactions.filter(type="income")
+
     # Price
     if priceFrom:
         transactions = transactions.filter(amount__gte=priceFrom)
@@ -47,12 +53,6 @@ def filter_transactions(transactions, post):
     # Is monthly
     if in_monthly != '':
         transactions = transactions.filter(category__monthly=in_monthly)
-
-    # Transactions type
-    if transaction_type == 2:
-        transactions = transactions.filter(type="expense")
-    elif transaction_type == 1:
-        transactions = transactions.filter(type="income")
 
     # Sort options
     if sort_by == '1':

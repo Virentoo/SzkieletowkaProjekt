@@ -14,6 +14,14 @@ class FilterForm(forms.Form):
 
 
 class NewTransactionForm(forms.ModelForm):
+    date = forms.DateTimeField(localize=False,
+                               input_formats=['%d/%m %H:%M'],
+
+                               widget=forms.DateTimeInput(attrs={
+                                   'class': 'form-control datetimepicker-input',
+                                   'data-target': '#datetimepicker1'}, )
+                               )
+
     class Meta:
         model = Transaction
         fields = [
@@ -28,13 +36,13 @@ class NewTransactionForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         super(NewTransactionForm, self).__init__(*args, **kwargs)
         self.fields['category'].queryset = Category.objects.filter(user=user)
-        self.fields['date'] = forms.DateTimeField(
-            input_formats=['%d/%m/%Y %H:%M'],
-            widget=forms.DateTimeInput(attrs={
-                'class': 'form-control datetimepicker-input',
-                'data-target': '#datetimepicker1'
-            })
-        )
+        self.fields['name'].label = "Tytuł tranzakcji"
+        self.fields['desc'].label = "Opis"
+        self.fields['type'].label = "Typ"
+        self.fields['category'].label = "Kategoria"
+        self.fields['date'].label = "Data"
+        self.fields['amount'].label = "Kwota"
+
 
     def clean(self):
         cd = self.cleaned_data
@@ -46,13 +54,3 @@ class NewTransactionForm(forms.ModelForm):
                 raise forms.ValidationError("Cena nie może być ujemna ani zerowa")
 
         return cd
-
-
-class DateForm(forms.Form):
-    date = forms.DateTimeField(
-        input_formats=['%d/%m/%Y %H:%M'],
-        widget=forms.DateTimeInput(attrs={
-            'class': 'form-control datetimepicker-input',
-            'data-target': '#datetimepicker1'
-        })
-    )

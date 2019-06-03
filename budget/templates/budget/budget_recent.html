@@ -55,12 +55,15 @@
         <form action="{% url 'budget/new' %}" method="post">
             {% csrf_token %}
             <button class="btn btn-info" id="transaction_button" value="new" type="submit">Dodaj
-                nową Transakcjęgk
+                nową Transakcję
             </button>
         </form>
         <br>
-        <button class="btn btn-info" id="charts_post_button" onclick="redirect_to_charts()" type="submit">Dodaj
+        <button class="btn btn-info" id="charts_post_button" onclick="redirect_to_charts()" type="submit">
             Pokaż wykres
+        </button>
+        <button class="btn btn-info" id="charts_post_button" onclick="gen_pdf()" type="submit">
+            Generuj plik PDF
         </button>
         <hr>
         {% block short_details %}
@@ -172,7 +175,7 @@
 
         sort_by = '';
         if (sessionStorage['br_sort_by'] != null) {
-            sort_by = sessionStorage['br_sort_by'];
+            sort_by = sessionStorage['br_sort_by'].substring(9);;
         } else {
             sessionStorage['br_sort_by'] = '&sort_by=1';
             sort_by = '1';
@@ -181,7 +184,7 @@
 
         const monthlyButton = document.getElementById('filter-form-monthly-button');
         if (sessionStorage['br_monthly'] != null) {
-            var value = sessionStorage['br_monthly'];
+            var value = sessionStorage['br_monthly'].substring(9);
             change_monthly_button(value);
             monthlyButton.onclick = function () {
                 on_monthly_button_click(value);
@@ -243,16 +246,12 @@
                         document.getElementById('budget_output').innerText = "All transaction are gone!";
                     }
                 };
-                {#checkboxDelete.className = "budget_item_icons_checkbox";#}
-                {#checkboxDelete.type = "checkbox";#}
-                {#checkboxDelete.style = 'width: 20px';#}
-                {#checkboxDelete.dataset.id = id;#}
-                {#list[i].appendChild(checkboxDelete);#}
                 list[i].appendChild(imgDelete);
             }
             const buttonRemSelected = document.createElement('button');
             buttonRemSelected.innerHTML = 'Remove filtred <i class="fa fa-trash-o"></i>';
             buttonRemSelected.id = 'upper_content_line_remove_selected_button';
+            buttonRemSelected.style = 'margin-left:10px';
             buttonRemSelected.className = 'btn btn-danger';
             buttonRemSelected.onclick = ev => {
                 var result = confirm("Remove all filtered transactions?");
@@ -421,6 +420,25 @@
             });
         }
 
+        function submitEdiForm() {
+            document.getElementById('form_transaction').submit();
+            return false;
+        }
+
+        function gen_pdf() {
+            const filter = $('#filter-form');
+            let data = filter.serialize();
+            for (let i = 0; i < sessionStorage.length; i++) {
+                if (!sessionStorage.key(i).startsWith('br_')) continue;
+                const sessionStorageVal = sessionStorage[sessionStorage.key(i)];
+                data += sessionStorageVal;
+            }
+            console.log(sessionStorage);
+            console.log(data);
+
+            window.location = 'http://127.0.0.1:8000/budget/pdf?' + data;
+        }
+
         function redirect_to_charts() {
             const filter = $('#filter-form');
             let data = filter.serialize();
@@ -432,17 +450,7 @@
             console.log(sessionStorage);
             console.log(data);
 
-            window.location = 'http://127.0.0.1:8000/budget/chart?'+data;
-            {#a = window.location = "{% url 'budget/chart' %}/?" + data;#}
-            return;
-            $.ajax({
-                type: 'POST',
-                url: "{% url 'budget/chart' %}",
-                data: data,
-                success: function (data) {
-                    document.getElementById('budget_output').innerHTML = data;
-                }
-            });
+            window.location = 'http://127.0.0.1:8000/budget/chart?' + data;
         }
 
         function request_new_data(valueName, value) {
