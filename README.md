@@ -27,3 +27,6 @@ Kacper:
 - generowanie pdf
 - edycja transakcji (Gotowe)
 - !poprawienie przeszukiwania (do obgadania)
+
+Pakiety:
+reportlab - Generowanie PDF
