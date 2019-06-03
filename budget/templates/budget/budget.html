@@ -107,13 +107,13 @@
             sessionStorage['b_sort_by'] = '&sort_by=' + 1;
             sort_by = '1';
         } else {
-            sort_by = sessionStorage['b_sort_by'];
+            sort_by = sessionStorage['b_sort_by'].substring(8);
         }
         change_sort_by_button(sort_by);
 
         const monthlyButton = document.getElementById('filter-form-monthly-button');
         if (sessionStorage['b_monthly'] != null) {
-            var value = sessionStorage['b_monthly'];
+            var value = sessionStorage['b_monthly'].substring(8);
             change_monthly_button(value);
             monthlyButton.onclick = function () {
                 on_monthly_button_click(value);
