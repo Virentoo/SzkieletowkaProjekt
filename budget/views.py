@@ -69,9 +69,9 @@ def get_category_budget(request):
 
     return render(request, 'budget/get_category_budget.html', context)
 
-
+@login_required()
 def home(request):
-    return render(request, 'budget/home.html')
+    return render(request, 'budget/budget.html')
 
 
 # class NewTransactionView(CreateView):

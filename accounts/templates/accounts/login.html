@@ -2,8 +2,7 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <div id="content" class="content-section"
-    style="padding: 20px; width: 100%">
+    <div id="content" style="width: 100%">
         <form method="POST">
             {% csrf_token %}
             <fieldset class="form-group">
@@ -20,4 +19,4 @@
             </small>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

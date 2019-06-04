@@ -17,7 +17,8 @@
 div#container {
     margin-left: auto;
     margin-right: auto;
-    background-color: #e1fcde;
+    background:url("bg.jpeg");
+
 }
 
 div#upper {
@@ -51,12 +52,13 @@ div#rightbar {
 }
 
 div#short_details {
-    padding: 10px;
+    padding-top: 60px;
+    padding-right: 40px;
     float: left;
     width: 25%;
     min-height: 720px;
     height: available;
-    background-color: #a3e2a8;
+    /*background-color: #a3e2a8;*/
 }
 
 div#footer {

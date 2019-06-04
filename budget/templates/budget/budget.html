@@ -25,31 +25,33 @@
 
 {% block right %}
     <div id="short_details">
+        <hr id="filter_line_break"/>
         <form action="{% url 'budget/new' %}" method="post">
             {% csrf_token %}
-            <button class="btn btn-info" id="new_button" value="new" type="submit">Dodaj Nową Transakcję
+            <button class="btn btn-info" id="new_button" value="new" type="submit">Add new transaction
             </button>
         </form>
-        <hr>
+        <hr id="filter_line_break"/>
         <form action="{% url 'budget/new_category' %}" method="post">
             {% csrf_token %}
-            <button class="btn btn-info" id="new_category_button" value="new_category_button" type="submit">Dodaj Nową
-                Kategorię
+            <button class="btn btn-info" id="new_category_button" value="new_category_button" type="submit">Add new category
             </button>
         </form>
-        <hr>
+        <hr id="filter_line_break"/>
         <form action="{% url 'budget/chart_unfiltred' %}" method="post">
             {% csrf_token %}
-            <button class="btn btn-info" id="chart_button" value="chart_button" type="submit">Pokaż wykres
+            <button class="btn btn-info" id="chart_button" value="chart_button" type="submit">Show plot
             </button>
         </form>
+        <hr id="filter_line_break"/>
         <button class="btn btn-info" id="charts_post_button" onclick="gen_pdf()" type="submit">
-            Generuj plik PDF
+            Generate a PDF file
         </button>
 
 
-        <hr>
-        <a href="{% url 'budget/recent' %}" class="btn btn-info">Show recent</a>
+        <hr id="filter_line_break"/>
+        <a href="{% url 'budget/recent' %}" class="btn btn-info">More details</a>
+        <hr id="filter_line_break"/>
         {% block short_details %}
             <form name="filter_form" id="filter-form" method="post">
                 {% csrf_token %}
@@ -86,9 +88,10 @@
                 <hr id="filter_line_break"/>
             </form>
             <div id="filter-form-buttons" style="margin-top: 10px">
-                <button class="btn btn-warning" style="width: 70px;" onclick="clearFilter()">Clear</button>
+                <button class="btn btn-danger" style="width: 70px;" onclick="clearFilter()">Clear</button>
                 <button class="btn btn-danger" style="width: 100px" onclick="onRemoveClick()">Remove</button>
             </div>
+            <hr id="filter_line_break"/>
         {% endblock %}
 
     </div>

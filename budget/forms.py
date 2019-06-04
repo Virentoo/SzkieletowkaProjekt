@@ -13,7 +13,7 @@ class FilterForm(forms.Form):
 
 class NewTransactionForm(forms.ModelForm):
     date = forms.DateTimeField(localize=False,
-                               input_formats=['%d/%m %H:%M'],
+                               input_formats=['%d.%m.%Y %H:%M'],
 
                                widget=forms.DateTimeInput(attrs={
                                    'class': 'form-control datetimepicker-input',

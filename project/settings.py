@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'crispy_forms'
+    'crispy_forms',
+    'captcha'
 ]
 
 SITE_ID = 1
@@ -109,7 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGE_CODE = 'pl-pl'
+LANGUAGE_CODE = 'en'
 
 TIME_ZONE = 'CET'
 
