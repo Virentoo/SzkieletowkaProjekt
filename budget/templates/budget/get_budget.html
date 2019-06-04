@@ -22,7 +22,13 @@
                         Price: {{ transaction.amount }} <br>
                         Date: {{ transaction.date|localize }} <br>
                     {% else %}
-                        <h6>Income: {{ transaction.name }} </h6>
+                        <form id="form_transaction" action="{% url 'edit' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="transaction_id" value={{ transaction.id }}>
+                            <a href="#" onclick="return submitEdiForm()">
+                                <h6>Income: {{ transaction.name }} </h6>
+                            </a>
+                        </form>
                         Desc: {{ transaction.desc }} <br>
                         Amount: {{ transaction.amount }} <br>
                         Date: {{ transaction.date|localize }} <br>
