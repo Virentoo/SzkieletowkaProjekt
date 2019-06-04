@@ -23,6 +23,8 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
 
     url(r'^captcha/', include('captcha.urls')),
+    url(r'profile/edit/$', user_views.edit_profile, name='edit_profile'),
+    url(r'profile/password/$', user_views.change_password, name='password'),
     path('admin/', admin.site.urls),
     path('register/', user_views.register, name='register'),
     path('profile/', user_views.profile, name='profile'),
