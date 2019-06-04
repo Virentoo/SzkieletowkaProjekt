@@ -3,7 +3,7 @@ from .views import NewCategoryView
 from . import views
 
 urlpatterns = [
-    path('', views.home, name='home'),
+    path('', views.budget, name='home'),
     path('budget', views.budget, name='budget'),
     path('budget/recent', views.budget_recent, name='budget/recent'),
     path('budget/new', views.new_transaction, name='budget/new'),
