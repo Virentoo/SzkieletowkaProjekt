@@ -16,8 +16,8 @@ Do zrobienia:
 
 Tomek:
 - modyfikacja profilu (usuwanie konta, zmiana hasła)
-- captcha
-- poprawa wyglądu strony
+- captcha (Gotowe)
+- poprawa wyglądu strony (Gotowe)
 
 Igor:
 - Docker
