@@ -31,3 +31,4 @@ Kacper:
 Pakiety:
 - reportlab - Generowanie PDF
 - crispyforms
+- django-simple-captcha
