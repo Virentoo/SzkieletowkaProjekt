@@ -34,12 +34,12 @@ class NewTransactionForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         super(NewTransactionForm, self).__init__(*args, **kwargs)
         self.fields['category'].queryset = Category.objects.filter(user=user)
-        self.fields['name'].label = "Tytuł tranzakcji"
-        self.fields['desc'].label = "Opis"
-        self.fields['type'].label = "Typ"
-        self.fields['category'].label = "Kategoria"
-        self.fields['date'].label = "Data"
-        self.fields['amount'].label = "Kwota"
+        self.fields['name'].label = "Transaction name"
+        self.fields['desc'].label = "Description"
+        self.fields['type'].label = "Type"
+        self.fields['category'].label = "Category"
+        self.fields['date'].label = "Date"
+        self.fields['amount'].label = "Amount"
 
 
     def clean(self):
@@ -49,6 +49,6 @@ class NewTransactionForm(forms.ModelForm):
 
         if amount is not None:
             if amount <= 0:
-                raise forms.ValidationError("Cena nie może być ujemna ani zerowa")
+                raise forms.ValidationError("Price cannot be less than or equal 0")
 
         return cd
