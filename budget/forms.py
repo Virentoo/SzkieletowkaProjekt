@@ -14,7 +14,6 @@ class FilterForm(forms.Form):
 class NewTransactionForm(forms.ModelForm):
     date = forms.DateTimeField(localize=False,
                                input_formats=['%d.%m.%Y %H:%M'],
-
                                widget=forms.DateTimeInput(attrs={
                                    'class': 'form-control datetimepicker-input',
                                    'data-target': '#datetimepicker1'}, )
@@ -40,7 +39,6 @@ class NewTransactionForm(forms.ModelForm):
         self.fields['category'].label = "Category"
         self.fields['date'].label = "Date"
         self.fields['amount'].label = "Amount"
-
 
     def clean(self):
         cd = self.cleaned_data

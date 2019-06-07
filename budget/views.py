@@ -1,25 +1,25 @@
-from django.shortcuts import render
-from django.urls import reverse
-from budget.models import Transaction, Category
+import datetime
+
+import reportlab
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.views.generic import CreateView
-from .forms import FilterForm, NewTransactionForm
-from .utils import convert_datetime, filter_transactions
+from django.core import serializers
+from django.db.models import Sum
 from django.http import Http404
 from django.http import HttpResponse
+from django.shortcuts import render
+from django.urls import reverse
+from django.utils import formats
 from django.utils import timezone
-import datetime
-from django.core import serializers
+from django.views.generic import CreateView
 from reportlab.lib.units import inch
-from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from django.utils import formats
-from django.db.models import Sum
-from django.contrib.staticfiles.templatetags.staticfiles import static
-from django.templatetags.static import static
-from django.conf import settings
-import reportlab
+from reportlab.pdfgen import canvas
+
+from budget.models import Transaction, Category
+from .forms import FilterForm, NewTransactionForm
+from .utils import filter_transactions
 
 
 @login_required()
@@ -37,7 +37,7 @@ def budget(request):
 @login_required()
 def get_category_budget(request):
     if request.method != 'POST':
-        raise Http404("Nein")
+        raise Http404("")
 
     user = request.user
     monthly = request.POST.get('monthly', '')
@@ -68,33 +68,6 @@ def get_category_budget(request):
     context['category_list'] = category_list
 
     return render(request, 'budget/get_category_budget.html', context)
-
-@login_required()
-def home(request):
-    return render(request, 'budget/budget.html')
-
-
-# class NewTransactionView(CreateView):
-#     model = Transaction
-#     template_name = 'budget/new.html'
-#     fields = ['name', 'desc', 'type', 'category', 'date', 'amount']
-#
-#     def form_valid(self, form):
-#         form.instance.user = self.request.user
-#         return super().form_valid(form)
-#
-#     def get_success_url(self):
-#         return reverse('budget')
-
-
-@login_required()
-def new_expense(request):
-    return render(request, 'budget/new.html')
-
-
-@login_required()
-def new_income(request):
-    return render(request, 'budget/new_income.html')
 
 
 def new_transaction(request):
@@ -138,7 +111,7 @@ def budget_recent(request):
 @login_required()
 def get_budget(request):
     if request.method != 'POST':
-        raise Http404("Nein")
+        raise Http404("")
 
     user = request.user
 
@@ -167,7 +140,7 @@ def clear_filter(request):
 
 def delete(request):
     if request.method != 'POST':
-        raise Http404("Nein")
+        raise Http404("")
     id = request.POST.getlist('transaction_id')
     if not id:
         return HttpResponse("Wrong id")
@@ -177,7 +150,7 @@ def delete(request):
 
 def delete_category(request):
     if request.method != 'POST':
-        raise Http404("Nein")
+        raise Http404("")
     id = request.POST['category_id']
     if not id:
         return HttpResponse("Wrong id")
@@ -188,7 +161,6 @@ def delete_category(request):
 @login_required()
 def chart(request):
     user = request.user
-    user_id = user.id
     category_list = list()
     categories = list()
     item_list = {}
@@ -236,16 +208,9 @@ def chart(request):
 @login_required()
 def chart_unfiltred(request):
     user = request.user
-    user_id = user.id
     category_list = Category.objects.filter(user=user).order_by('-name')
     categories = list()
     item_list = {}
-
-    # Tutaj najpierw pobieram liste wszystkich tranzacji uzytkownika
-    transaction_list = Transaction.objects.filter(category__user=user)
-    # A potem przefiltrowuje ją
-    # 'transaction_list' - list tranzakcji
-    transaction_list = filter_transactions(transaction_list, request.GET)
 
     for category in category_list:
         categories.append(category.name)
@@ -377,7 +342,6 @@ def gen_pdf(request):
             "Data: %s %s" % (formats.date_format(transaction.date), formats.time_format(transaction.date)))
         textobject.textLine("Ilość: %s" % transaction.amount)
         textobject.textLine("Opis: %s" % transaction.desc)
-        # Move origin about textobject height and additional spacing
         objsize = -(textobject.getY() - 20 * 1.2)
         y -= objsize
         if y - footSize < 0:
@@ -411,7 +375,6 @@ def gen_pdf(request):
             "Data: %s %s" % (formats.date_format(transaction.date), formats.time_format(transaction.date)))
         textobject.textLine("Cena: %s" % transaction.amount)
         textobject.textLine("Opis: %s" % transaction.desc)
-        # Move origin about textobject height and additional spacing
         objsize = -(textobject.getY() - 25 * 1.2)
         y -= objsize
         if y - footSize < 0:

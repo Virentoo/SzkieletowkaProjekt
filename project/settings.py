@@ -116,7 +116,7 @@ TIME_ZONE = 'CET'
 
 USE_I18N = True
 
-USE_L10N = True
+USE_L10N = False
 
 USE_TZ = True
 
@@ -124,7 +124,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-DATETIME_FORMAT = 'd/m/Y H:i'
+DATETIME_FORMAT = 'd.m.Y H:i'
 
 STATIC_URL = '/static/'
 
