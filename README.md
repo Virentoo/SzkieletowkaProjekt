@@ -15,7 +15,7 @@ Hasło: nupbpgfhiuboyd21
 Do zrobienia:
 
 Tomek:
-- modyfikacja profilu (usuwanie konta, zmiana hasła)
+- modyfikacja profilu (usuwanie konta, zmiana hasła) (Gotowe)
 - captcha (Gotowe)
 - poprawa wyglądu strony (Gotowe)
 
