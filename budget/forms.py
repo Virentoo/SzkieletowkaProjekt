@@ -12,12 +12,14 @@ class FilterForm(forms.Form):
 
 
 class NewTransactionForm(forms.ModelForm):
-    date = forms.DateTimeField(localize=False,
-                               input_formats=['%d.%m.%Y %H:%M'],
-                               widget=forms.DateTimeInput(attrs={
-                                   'class': 'form-control datetimepicker-input',
-                                   'data-target': '#datetimepicker1'}, )
-                               )
+    date = forms.DateTimeField(
+        input_formats=['%d-%m-%Y %H:%M'],
+        widget=forms.DateTimeInput(attrs={
+            'class': 'form-control datetimepicker-input',
+            'data-target': '#datetimepicker1'},
+            format='%d-%m-%Y %H:%M',
+        )
+    )
 
     class Meta:
         model = Transaction

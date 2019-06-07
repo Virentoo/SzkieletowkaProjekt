@@ -28,7 +28,7 @@
     <div class="content-section"
          id="content"
          style="width: 100%;">
-        <form method="POST" action="{% url 'budget/recent' %}">
+        <form method="POST">
             {% csrf_token %}
             <input type="hidden" name="transaction_id" value={{ transaction_id }}>
             <fieldset class="form-group">
@@ -65,8 +65,8 @@
     <script type="text/javascript">
         $(function () {
             $('#datetimepicker1').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm',
-                extraFormats: ['YYYY-MM-DD HH:mm']
+                format: 'DD-MM-YYYY HH:mm',
+                extraFormats: ['DD-MM-YYYY HH:mm']
             });
         });
     </script>

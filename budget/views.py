@@ -262,7 +262,7 @@ def edit(request):
         t = form.save(commit=False)
         t.pk = transaction.pk
         t.save()
-        return render(request, 'budget/budget.html')
+        return budget_recent(request)
     else:
         form = NewTransactionForm(request.user, instance=transaction)
 

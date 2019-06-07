@@ -11,27 +11,27 @@
                 <th style="font-weight: normal"
                     class="shadow-sm p-3 mb-5 bg-white budget_item_desc">
                     {% if transaction.type == 'expense' %}
-                        <form id="form_transaction" action="{% url 'edit' %}" method="post">
+                        <form id="form_transaction{{ transaction.id}}" action="{% url 'edit' %}" method="post">
                             {% csrf_token %}
-                            <input type="hidden" name="transaction_id" value={{ transaction.id }}>
-                            <a href="#" onclick="return submitEdiForm()">
+                            <input type="hidden" name="transaction_id" value='{{ transaction.id }}'>
+                            <a href="#" onclick="return submitEdiForm('form_transaction{{ transaction.id}}')">
                                 <h6>Expense: {{ transaction.name }} </h6>
                             </a>
                         </form>
                         Desc: {{ transaction.desc }} <br>
                         Price: {{ transaction.amount }} <br>
-                        Date: {{ transaction.date|localize }} <br>
+                        Date: {{ transaction.date }} <br>
                     {% else %}
-                        <form id="form_transaction" action="{% url 'edit' %}" method="post">
+                        <form id="form_transaction{{ transaction.id}}" action="{% url 'edit' %}" method="post">
                             {% csrf_token %}
-                            <input type="hidden" name="transaction_id" value={{ transaction.id }}>
-                            <a href="#" onclick="return submitEdiForm()">
+                            <input type="hidden" name="transaction_id" value='{{ transaction.id }}'>
+                            <a href="#" onclick="return submitEdiForm('form_transaction{{ transaction.id}}')">
                                 <h6>Income: {{ transaction.name }} </h6>
                             </a>
                         </form>
                         Desc: {{ transaction.desc }} <br>
                         Amount: {{ transaction.amount }} <br>
-                        Date: {{ transaction.date|localize }} <br>
+                        Date: {{ transaction.date }} <br>
                     {% endif %}
                 </th>
             </tr>
