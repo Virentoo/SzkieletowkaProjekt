@@ -1,3 +1,7 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'budget/chart.css' %}">
+
 <!doctype html>
 <html>
 <head>
@@ -5,13 +9,18 @@
   <title>Chart</title>
 </head>
 <body>
-     <div id="content" style="width: 100%">
+  <div id="container" align="right" style="width:100%; height:75%;"></div>
   <script src="https://code.highcharts.com/highcharts.src.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
     var myChart = Highcharts.chart('container', {
         chart: {
-            type: 'bar'
+            type: 'bar',
+            floating: true,
+            backgroundColor: '#F5F5F5',
+    		layout: 'horizontal',
+    		align: 'center',
+    		verticalAlign: 'top'
         },
         title: {
             text: 'Overall overview'
@@ -33,7 +42,15 @@
   </script>
 
 
-</div>
-{{categories_id}}
+
+<form action="{% url 'budget/recent' %}" method="post">
+            {% csrf_token %}
+            <button class="btn btn-info" style="height: 75px; width: 400px; position: relative; top: 40px; left: 650px;" id="chart_button" value="chart_button" type="submit">
+            <font size="6">Return</font>
+            </button>
+</form>
+
+
+  
 </body>
 </html>
