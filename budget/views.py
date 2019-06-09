@@ -297,7 +297,7 @@ def gen_pdf(request):
     expense_list = transaction_list.filter(type='expense')
 
     pdf.setFont('Calibri', 20)
-    pdf.drawString(-inch / 2, 0, 'Ogólne statystyki')
+    pdf.drawString(-inch / 2, 0, 'Overall statistics')
     pdf.rect(-inch, -5, 4 * inch, 2, fill=1)
     addspacing = 25 * 1.4
     y -= addspacing
@@ -311,12 +311,12 @@ def gen_pdf(request):
     if not sumExpense:
         sumExpense = 0
     textobject.setFont('Calibri', 12)
-    textobject.textLine('Liczba wszystkich tranzakcji: %d' % len(transaction_list))
-    textobject.textLine('Liczba wydatków: %d' % len(expense_list))
-    textobject.textLine('Liczba przychodów: %d' % len(income_list))
-    textobject.textLine('Suma wydanych pieniędzy: %dzł' % sumExpense)
-    textobject.textLine('Suma wpłyniętych pieniędzy: %dzł' % sumIncome)
-    textobject.textLine('Bilans: %dzł' % (sumIncome - sumExpense))
+    textobject.textLine('Number of all transactions: %d' % len(transaction_list))
+    textobject.textLine('Number of expenses: %d' % len(expense_list))
+    textobject.textLine('Number of incomes: %d' % len(income_list))
+    textobject.textLine('The amount of money spent: %dzł' % sumExpense)
+    textobject.textLine('The amount of money received: %dzł' % sumIncome)
+    textobject.textLine('Balance: %dzł' % (sumIncome - sumExpense))
     pdf.drawText(textobject)
     objsize = -(textobject.getY() - 20)
     y -= objsize
@@ -324,7 +324,7 @@ def gen_pdf(request):
 
     if len(income_list) > 0:
         pdf.setFont('Calibri', 20)
-        pdf.drawString(-inch / 2, 0, 'Przychody')
+        pdf.drawString(-inch / 2, 0, 'Incomes')
         pdf.rect(-inch, -5, 4 * inch, 2, fill=1)
         addspacing = 25 * 1.4
         y -= addspacing
@@ -337,11 +337,11 @@ def gen_pdf(request):
         textobject.setFont("Calibri", 16)
         textobject.textLine("%d. %s" % (i, transaction.name))
         textobject.setFont("Calibri", 12)
-        textobject.textLine("Kategoria: %s" % transaction.category.name)
+        textobject.textLine("Category: %s" % transaction.category.name)
         textobject.textLine(
             "Data: %s %s" % (formats.date_format(transaction.date), formats.time_format(transaction.date)))
-        textobject.textLine("Ilość: %s" % transaction.amount)
-        textobject.textLine("Opis: %s" % transaction.desc)
+        textobject.textLine("Amount: %s" % transaction.amount)
+        textobject.textLine("Description: %s" % transaction.desc)
         objsize = -(textobject.getY() - 20 * 1.2)
         y -= objsize
         if y - footSize < 0:
@@ -357,7 +357,7 @@ def gen_pdf(request):
         y = topy
     if len(expense_list) > 0:
         pdf.setFont('Calibri', 20)
-        pdf.drawString(-inch / 2, 0, 'Wydatki')
+        pdf.drawString(-inch / 2, 0, 'Expenses')
         pdf.rect(-inch, -5, 4 * inch, 2, fill=1)
         addspacing = 25 * 1.4
         y -= addspacing
@@ -370,11 +370,11 @@ def gen_pdf(request):
         textobject.setFont("Calibri", 16)
         textobject.textLine("%d. %s" % (i, transaction.name))
         textobject.setFont("Calibri", 12)
-        textobject.textLine("Kategoria: %s" % transaction.category.name)
+        textobject.textLine("Category: %s" % transaction.category.name)
         textobject.textLine(
             "Data: %s %s" % (formats.date_format(transaction.date), formats.time_format(transaction.date)))
-        textobject.textLine("Cena: %s" % transaction.amount)
-        textobject.textLine("Opis: %s" % transaction.desc)
+        textobject.textLine("Price: %s" % transaction.amount)
+        textobject.textLine("Description: %s" % transaction.desc)
         objsize = -(textobject.getY() - 25 * 1.2)
         y -= objsize
         if y - footSize < 0:
