@@ -2,33 +2,34 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% load l10n %}
-
+ 
 {% block head %}
     <!-- Font Awesome -->
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
           integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-
+ 
     <!-- Moment.js -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-
-
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/pl.js"></script>
+ 
+ 
     <!-- Tempus Dominus Bootstrap 4 -->
     <script type="text/javascript"
             src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/js/tempusdominus-bootstrap-4.min.js"></script>
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/css/tempusdominus-bootstrap-4.min.css"/>
-
+ 
 {% endblock %}
-
+ 
 {% block upper %}
-
+ 
 {% endblock %}
-
+ 
 {% block content %}
     <div class="content-section"
          id="content"
          style="width: 100%;">
-        <form method="POST">
+        <form action={% url 'budget' %} method="POST">
             {% csrf_token %}
             <input type="hidden" name="transaction_id" value={{ transaction_id }}>
             <fieldset class="form-group">
@@ -38,7 +39,7 @@
                     {% endblock %}
                 </legend>
             </fieldset>
-
+ 
             {{ form.name|as_crispy_field }}
             {{ form.desc|as_crispy_field }}
             {{ form.type|as_crispy_field }}
@@ -65,12 +66,11 @@
     <script type="text/javascript">
         $(function () {
             $('#datetimepicker1').datetimepicker({
-                format: 'DD-MM-YYYY HH:mm',
-                extraFormats: ['DD-MM-YYYY HH:mm']
+                locale: moment().locale('pl')
             });
         });
     </script>
 {% endblock content %}
-
+ 
 {% block short_details %}
 {% endblock %}
