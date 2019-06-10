@@ -32,3 +32,13 @@ Pakiety:
 - reportlab - Generowanie PDF
 - crispyforms
 - django-simple-captcha
+
+DO POPRAWIENIA:
+1.
+DEBUG = False
+
+ALLOWED_HOSTS = ["*"]
+
+
+2.
+https://pastebin.com/j9Mh2mLq
