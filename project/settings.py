@@ -127,6 +127,7 @@ USE_TZ = True
 
 DATETIME_FORMAT = 'd.m.Y H:i'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
