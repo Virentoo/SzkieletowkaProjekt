@@ -77,7 +77,7 @@ def new_transaction(request):
             transaction = form.save(commit=False)
             transaction.user = request.user
             transaction.save()
-            return render(request, 'budget/budget.html')
+            return budget(request)
     else:
         form = NewTransactionForm(request.user)
     return render(request, 'budget/new.html', {'form': form})
